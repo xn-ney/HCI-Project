@@ -86,6 +86,63 @@ git config user.email
 
 Since they are already global or in every repository.
 
+## Step 5: Push and Pull
+
+Since you forked a repo, you are only pushing and pulling from your **OWN** forked repo and not from the original repo made by Xander Ney Lopez. To do push and pulls normally, from your terminal, follow these steps:
+
+```bash
+git remote add upsteam https://github.com/ORIGINAL_OWNER/REPO.git
+```
+Replace the link with the original owner's repo and you must be in your forked main branch.
+
+Now you should see two things by using:
+
+```bash
+git remote -v
+```
+
+It would be:
+
+```bash
+origin
+upstream
+```
+
+The upstream is where you **PULL** and not **PUSH**. Do not push anything in the upstream. Anything that changes in the main and original repo, pull using:
+
+```bash
+git pull upstream main
+```
+
+If you want to commit and push a change, do this:
+
+```bash
+git add file_name
+git commit -m "Your Message"
+git push origin main
+```
+
+Origin Main is YOUR Forked Repo. You can both **PUSH** and **PULL** from Origin
+
+## Step 6: Creating a Pull Request to the Owner of the Repo (Xander Ney Lopez HCI Project)
+
+After pushing your changes, it would not simply go inside the original repo. It must be reviewed by the leader or who those appointed to it.
+
+To make a Pull Request (PR), and after pushing your changes in YOUR repo, simply go to your Forked Repo and you will see a banner that says "**Compare & Pull Request**"
+
+Another option is to go to **Pull Request** Tab and click Pull Request.
+
+Check if the base repo and branch are good, Base repo and branch are the **ORIGINAL** Repo and where you send the changes. The next thing is the compare repo and branch- basically your Forked Repo and Branch.
+
+This should look something like this:
+
+```bash
+base: original-repo/main
+compare: your-fork/your-branch
+```
+
+After checking everything, Click **Create Pull Request**, add a title + description, and then submit.
+
 ## Questions
 
 If you have any question, please refer to John Vincent Castro or Xander Ney Lopez.
