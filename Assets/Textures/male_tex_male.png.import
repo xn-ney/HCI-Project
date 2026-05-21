@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://3arfqvdbxdag"
-path.s3tc="res://.godot/imported/dummy_platformer_tex_prototype_map.png-36e5dd948fb1e9d23eec402f68b025c1.s3tc.ctex"
+uid="uid://dffhvv1xsibva"
+path.s3tc="res://.godot/imported/male_tex_male.png-0afeb2a64c000a66c81b3c68a7bdd871.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "2ca1abd130d6eed17cb7204c983a3a96"
+"md5": "65abcccc1365af7b29502eaf99828812"
 }
 
 [deps]
 
-source_file="res://Textures/dummy_platformer_tex_prototype_map.png"
-dest_files=["res://.godot/imported/dummy_platformer_tex_prototype_map.png-36e5dd948fb1e9d23eec402f68b025c1.s3tc.ctex"]
+source_file="res://Assets/Textures/male_tex_male.png"
+dest_files=["res://.godot/imported/male_tex_male.png-0afeb2a64c000a66c81b3c68a7bdd871.s3tc.ctex"]
 
 [params]
 

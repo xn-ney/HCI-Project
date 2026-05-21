@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://csm1bio200h7y"
-path="res://.godot/imported/dummy_platformer.glb-ebfef61f1c57cfc37e4de9930ccf2c4b.scn"
+uid="uid://dflx15h0xquuc"
+path="res://.godot/imported/gridmap_a.glb-c044ce9e52ca3ebc505f443b82024f2c.scn"
 
 [deps]
 
-source_file="res://Textures/dummy_platformer.glb"
-dest_files=["res://.godot/imported/dummy_platformer.glb-ebfef61f1c57cfc37e4de9930ccf2c4b.scn"]
+source_file="res://Assets/Textures/gridmap_a.glb"
+dest_files=["res://.godot/imported/gridmap_a.glb-c044ce9e52ca3ebc505f443b82024f2c.scn"]
 
 [params]
 

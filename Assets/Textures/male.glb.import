@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://ch0pv0q053a4l"
-path="res://.godot/imported/male.glb-3ed09aba505156674a8a0be90ec0999c.scn"
+path="res://.godot/imported/male.glb-e6e49aa30821ce98ab0b54e4957bad2b.scn"
 
 [deps]
 
-source_file="res://Textures/male.glb"
-dest_files=["res://.godot/imported/male.glb-3ed09aba505156674a8a0be90ec0999c.scn"]
+source_file="res://Assets/Textures/male.glb"
+dest_files=["res://.godot/imported/male.glb-e6e49aa30821ce98ab0b54e4957bad2b.scn"]
 
 [params]
 

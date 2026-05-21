@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cyc0h7woepj5h"
-path.s3tc="res://.godot/imported/objects_tex_prototype_map.png-188550feced5346f5db23791b865cf88.s3tc.ctex"
+uid="uid://3arfqvdbxdag"
+path.s3tc="res://.godot/imported/dummy_platformer_tex_prototype_map.png-00abc49fc45d7f10f95cb7590ec890ae.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -14,8 +14,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://Textures/objects_tex_prototype_map.png"
-dest_files=["res://.godot/imported/objects_tex_prototype_map.png-188550feced5346f5db23791b865cf88.s3tc.ctex"]
+source_file="res://Assets/Textures/dummy_platformer_tex_prototype_map.png"
+dest_files=["res://.godot/imported/dummy_platformer_tex_prototype_map.png-00abc49fc45d7f10f95cb7590ec890ae.s3tc.ctex"]
 
 [params]
 

@@ -1,9 +1,9 @@
 [gd_scene format=4 uid="uid://d5mcvefojdiw"]
 
-[ext_resource type="Texture2D" uid="uid://cp1wfulrmcaqm" path="res://Textures/Brick_Texture.png" id="1_8j60k"]
-[ext_resource type="PackedScene" uid="uid://ctu0ijhkofc6e" path="res://Objects/player.tscn" id="1_a02cp"]
-[ext_resource type="PackedScene" uid="uid://dflx15h0xquuc" path="res://Textures/gridmap_a.glb" id="2_go701"]
-[ext_resource type="Texture2D" uid="uid://dv2mjae4k8jno" path="res://Textures/gridmap_a_tex_prototype_map.png" id="3_5a7ea"]
+[ext_resource type="Texture2D" uid="uid://cp1wfulrmcaqm" path="res://Assets/Textures/Brick_Texture.png" id="1_8j60k"]
+[ext_resource type="PackedScene" uid="uid://ctu0ijhkofc6e" path="res://Assets/Objects/player.tscn" id="1_a02cp"]
+[ext_resource type="PackedScene" uid="uid://dflx15h0xquuc" path="res://Assets/Textures/gridmap_a.glb" id="2_go701"]
+[ext_resource type="Texture2D" uid="uid://dv2mjae4k8jno" path="res://Assets/Textures/gridmap_a_tex_prototype_map.png" id="3_5a7ea"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_yp4wr"]
 size = Vector3(40, 1, 40)
@@ -101,25 +101,25 @@ transform = Transform3D(0.81403166, 0.5310083, -0.23533542, 0.19368804, 0.133808
 [node name="gridmap_a" parent="." unique_id=967226793 instance=ExtResource("2_go701")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4775448, 0, 15.574497)
 
-[node name="cube 2x4" parent="gridmap_a" index="0" unique_id=1688760967]
+[node name="cube 2x4" parent="gridmap_a" index="0" unique_id=1764977782]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, -21.5)
 
-[node name="ramp 2x2" parent="gridmap_a" index="2" unique_id=643676720]
+[node name="ramp 2x2" parent="gridmap_a" index="2" unique_id=135478100]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -5.8415885, 0, -21.535624)
 
-[node name="cube 2x2" parent="gridmap_a" index="4" unique_id=550789615]
+[node name="cube 2x2" parent="gridmap_a" index="4" unique_id=1115535585]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.379445, 0, -21.52068)
 
-[node name="cube 4x4" parent="gridmap_a" index="5" unique_id=460477431]
+[node name="cube 4x4" parent="gridmap_a" index="5" unique_id=1093943039]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, -21.670221)
 
-[node name="cube 1x2" parent="gridmap_a" index="6" unique_id=663849850]
+[node name="cube 1x2" parent="gridmap_a" index="6" unique_id=1204825063]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.907352, 1.9032724, -20.487623)
 
-[node name="wooden plat1" parent="gridmap_a" index="14" unique_id=721449527]
+[node name="wooden plat1" parent="gridmap_a" index="14" unique_id=811777786]
 transform = Transform3D(1, 0, 0, 0, -4.3711385e-08, 0.99999994, 0, -0.99999994, -4.3711385e-08, 17.52017, 1, -35.3638)
 
-[node name="wall 2x1corner" parent="gridmap_a" index="19" unique_id=688366776]
+[node name="wall 2x1corner" parent="gridmap_a" index="19" unique_id=721167818]
 transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 2.9169407, 2.0250416, -21.5)
 
 [node name="wooden plat2" type="MeshInstance3D" parent="gridmap_a" unique_id=1589466346]
