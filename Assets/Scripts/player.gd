@@ -62,6 +62,11 @@ var iframe_timer = 0.0
 # Stun -------------------------------------------
 var stun_timer = 0.0
 
+# Knockback ----------------------------------------
+var knockback_velocity = Vector3.ZERO
+const KNOCKBACK_FRICTION = 8.0
+var knock_up = 0.0
+
 # Stamina -----------------------------------------
 var stamina = 100.0
 var max_stamina = 100.0
@@ -167,6 +172,7 @@ func _physics_process(delta: float) -> void:
 				_melee_hit_animation()
 				active_class.melee_follow_through()
 		active_class.process_class(delta)
+		_apply_knockback(delta)
 		move_and_slide()
 		return
 
@@ -330,6 +336,7 @@ func _physics_process(delta: float) -> void:
 # Process active abilities (may override velocity) -
 	active_class.process_class(delta)
 
+	_apply_knockback(delta)
 	move_and_slide()
 
 
@@ -351,6 +358,18 @@ func ranged_animation(duration: float = 0.2):
 	var tw = create_tween()
 	tw.tween_property(weapon_holder, "position", FIST_LUNGE_POS, 0.1)
 	tw.tween_property(weapon_holder, "position", right_rest_pos, max(duration - 0.1, 0.05))
+
+
+# Knockback Processing ---------------------------
+func _apply_knockback(delta: float):
+	if knock_up > 0:
+		velocity.y = knock_up
+		knock_up = 0.0
+
+	if knockback_velocity.length() > 0.1:
+		velocity.x = knockback_velocity.x
+		velocity.z = knockback_velocity.z
+		knockback_velocity = knockback_velocity.lerp(Vector3.ZERO, KNOCKBACK_FRICTION * delta)
 
 
 # DMG Taken ---------------------------------------

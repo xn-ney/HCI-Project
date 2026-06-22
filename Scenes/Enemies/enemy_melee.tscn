@@ -1,7 +1,34 @@
 [gd_scene format=3 uid="uid://cp588maigp4mi"]
 
-[ext_resource type="PackedScene" uid="uid://bms8is17u8noy" path="res://Scenes/enemy.tscn" id="1_61dxe"]
-[ext_resource type="Script" uid="uid://cnp87kqmd4jh8" path="res://Assets/Scripts/Enemies/enemy_melee.gd" id="2_o71wv"]
+[ext_resource type="Script" uid="uid://cnp87kqmd4jh8" path="res://Assets/Scripts/Enemies/enemy_melee.gd" id="1_hghv2"]
 
-[node name="Enemy" unique_id=378547284 instance=ExtResource("1_61dxe")]
-script = ExtResource("2_o71wv")
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ne65n"]
+albedo_color = Color(0.8384838, 2.815649e-06, 9.62615e-07, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
+
+[node name="Enemy2" type="CharacterBody3D" unique_id=436631574 groups=["enemies"]]
+collision_layer = 8
+script = ExtResource("1_hghv2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=254163438]
+shape = SubResource("CapsuleShape3D_0oxh4")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=175773632]
+material_override = SubResource("StandardMaterial3D_ne65n")
+mesh = SubResource("CapsuleMesh_q26ig")
+
+[node name="ProjectileSpawn" type="Node3D" parent="." unique_id=1388259209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.5257821, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=587323435]
+
+[node name="HPLabel" type="Label3D" parent="." unique_id=352974883]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+billboard = 1
+text = "200"
+font_size = 48
+outline_size = 4

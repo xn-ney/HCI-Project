@@ -30,6 +30,7 @@ const BRANDED_DURATION = 5.0
 # LMB: Banishment ---------------------------------
 const BANISHMENT_DAMAGE = 14.0
 const BANISHMENT_PUSH = 25.0
+const BANISHMENT_KNOCKUP = 8.0
 const BANISHMENT_RANGE = 4.0
 var parry_window = false
 const PARRY_WINDOW = 0.2
@@ -135,7 +136,7 @@ func melee_attack() -> void:
 		body.take_damage(BANISHMENT_DAMAGE)
 		var push_dir = (body.global_position - player.global_position).normalized()
 		push_dir.y = 0.0
-		body.set("impulse", Vector3.UP * 8.0)
+		body.set("impulse", Vector3.UP * BANISHMENT_KNOCKUP)
 		body.set("knockback_velocity", push_dir * BANISHMENT_PUSH)
 		if not body.is_in_group("branded") and not first_unbranded:
 			first_unbranded = body

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bms8is17u8noy"]
 
-[ext_resource type="Script" uid="uid://c7kskwr83ww6d" path="res://Assets/Scripts/enemy.gd" id="1_hghv2"]
+[ext_resource type="Script" path="res://Assets/Scripts/Enemies/enemy_ranged_lob.gd" id="1_hghv2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
 
@@ -9,23 +9,23 @@ albedo_color = Color(0.8384838, 2.815649e-06, 9.62615e-07, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
 
-[node name="Enemy" type="CharacterBody3D" unique_id=378547284 groups=["enemies"]]
+[node name="Enemy" type="CharacterBody3D" groups=["enemies"]]
 collision_layer = 8
 script = ExtResource("1_hghv2")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=269078333]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_0oxh4")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1069513415]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_ne65n")
 mesh = SubResource("CapsuleMesh_q26ig")
 
-[node name="ProjectileSpawn" type="Node3D" parent="." unique_id=1759266671]
+[node name="ProjectileSpawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.5257821, 0)
 
-[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=98740465]
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 
-[node name="HPLabel" type="Label3D" parent="." unique_id=553344221]
+[node name="HPLabel" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 billboard = 1
 text = "200"
