@@ -15,19 +15,25 @@ const MOVE_SPEED = 2.5
 # Normal Swing --------------------------------------
 const MELEE_DAMAGE = 30.0
 const MELEE_KNOCKBACK = 30.0
-const MELEE_RANGE = 3.0
+const MELEE_RANGE = 5.0
 const ATTACK_COOLDOWN = 2.5
 
+# Chase --------------------------------------------
+const CHASE_TIMEOUT = 5.0
+const CHASE_READY_DELAY = 0.8
+const CHASE_SPEED_MULT = 1.9
+
 # Dash and Slam -------------------------------------
-const DASH_CHANCE = 0.3
+const DASH_CHANCE = 1
 const DASH_CHARGE_TIME = 2.5
-const DASH_SPEED = 20.0
+const DASH_SPEED = 30.0
 const DASH_DURATION = 0.35
+const DASH_STOP_RANGE = 2.0
 const SLAM_DAMAGE = 40.0
 const SLAM_KNOCKUP = 15.0
-const SLAM_RANGE = 2.0
+const SLAM_RANGE = 7
 const SLAM_KNOCKBACK = 30.0
-const SLAM_WINDUP = 1
+const SLAM_WINDUP = 0.8
 
 # Interrupt ------------------------------------------
 const INTERRUPT_DURATION = 1.5
@@ -44,6 +50,9 @@ const IDLE_WALK_MAX = 3.0
 const IDLE_PAUSE = 1.5
 const IDLE_MOVE_SPEED = 1.5
 
+# Magic Circle --------------------------------------
+const MAGIC_CIRCLE_TEXTURE = preload("res://Assets/Objects/magic circle prototype.png")
+
 # Knockback -----------------------------------------
 const KNOCKBACK_FRICTION = 8.0
 const SEPARATION_RADIUS = 1.5
@@ -57,17 +66,20 @@ var dash_dir = Vector3.ZERO
 
 # References ----------------------------------------
 var player = null
+var slam_indicator: Sprite3D = null
+var melee_indicator: Sprite3D = null
 
 @onready var nav_agent = $NavigationAgent3D
 @onready var hp_label = $HPLabel
 
 # State machine -------------------------------------
 enum State { IDLE, PREPARE, ATTACK }
-enum AttackPhase { CHASE, DASH_CHARGE, DASHING, SLAMMING }
+enum AttackPhase { CHASE, CHASE_READY, DASH_CHARGE, DASHING, SLAMMING }
 enum PreparePhase { WALK, PAUSE }
 
 var state = State.IDLE
 var attack_phase = AttackPhase.CHASE
+var chase_timer = 0.0
 var prepare_phase = PreparePhase.WALK
 var state_timer = 0.0
 var prepare_move_timer = 0.0
@@ -81,6 +93,8 @@ var wander_dir = Vector3.ZERO
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
 	_idle_pick_wander()
+	_slam_indicator_create()
+	_melee_indicator_create()
 
 
 func _physics_process(delta: float) -> void:
@@ -108,6 +122,7 @@ func _physics_process(delta: float) -> void:
 				if distance <= DETECTION_RANGE:
 					state = State.ATTACK
 					attack_phase = AttackPhase.CHASE
+					chase_timer = CHASE_TIMEOUT
 				else:
 					match idle_phase:
 						PreparePhase.WALK:
@@ -156,11 +171,12 @@ func _physics_process(delta: float) -> void:
 						velocity = Vector3.ZERO
 					else:
 						attack_phase = AttackPhase.CHASE
+						chase_timer = CHASE_TIMEOUT
 
 			State.ATTACK:
 				match attack_phase:
 					AttackPhase.CHASE:
-						var move_speed = MOVE_SPEED * speed_multiplier * 1.5
+						var move_speed = MOVE_SPEED * speed_multiplier * CHASE_SPEED_MULT
 						if is_in_group("branded"):
 							move_speed *= 0.85
 						nav_agent.target_position = player.global_position
@@ -169,6 +185,26 @@ func _physics_process(delta: float) -> void:
 						velocity.x = move_dir.x * move_speed
 						velocity.z = move_dir.z * move_speed
 						if distance <= MELEE_RANGE:
+							velocity = Vector3.ZERO
+							attack_phase = AttackPhase.CHASE_READY
+							state_timer = CHASE_READY_DELAY
+							melee_indicator.visible = true
+						chase_timer -= delta
+						if chase_timer <= 0:
+							if randf() < DASH_CHANCE:
+								attack_phase = AttackPhase.DASH_CHARGE
+								state_timer = DASH_CHARGE_TIME
+								velocity = Vector3.ZERO
+							else:
+								_melee_attack()
+								_attack_finished(distance)
+
+					AttackPhase.CHASE_READY:
+						velocity.x = 0.0
+						velocity.z = 0.0
+						state_timer -= delta
+						if state_timer <= 0:
+							melee_indicator.visible = false
 							_melee_attack()
 							_attack_finished(distance)
 
@@ -186,7 +222,7 @@ func _physics_process(delta: float) -> void:
 						velocity.x = dash_dir.x * DASH_SPEED
 						velocity.z = dash_dir.z * DASH_SPEED
 						state_timer -= delta
-						if state_timer <= 0:
+						if distance <= DASH_STOP_RANGE or state_timer <= 0:
 							velocity = Vector3.ZERO
 							attack_phase = AttackPhase.SLAMMING
 							state_timer = SLAM_WINDUP
@@ -194,8 +230,10 @@ func _physics_process(delta: float) -> void:
 					AttackPhase.SLAMMING:
 						velocity.x = 0.0
 						velocity.z = 0.0
+						slam_indicator.visible = true
 						state_timer -= delta
 						if state_timer <= 0:
+							slam_indicator.visible = false
 							_slam_attack()
 							_attack_finished(distance)
 
@@ -261,6 +299,8 @@ func _prepare_enter() -> void:
 
 
 func _melee_attack() -> void:
+	if global_position.distance_to(player.global_position) > MELEE_RANGE:
+		return
 	player.take_damage(MELEE_DAMAGE)
 	var push_dir = (player.global_position - global_position).normalized()
 	push_dir.y = 0.0
@@ -288,6 +328,28 @@ func _separate_from_others() -> void:
 			push += away * (SEPARATION_RADIUS - dist) / SEPARATION_RADIUS
 	if push != Vector3.ZERO:
 		velocity += push * SEPARATION_FORCE
+
+
+func _make_floor_circle(radius: float) -> Sprite3D:
+	var sprite = Sprite3D.new()
+	sprite.texture = MAGIC_CIRCLE_TEXTURE
+	sprite.centered = true
+	sprite.billboard = false
+	sprite.rotation.x = -PI / 2
+	var tex_size = sprite.texture.get_size()
+	sprite.pixel_size = (radius * 2.0) / tex_size.x
+	sprite.position.y = 0.05
+	sprite.visible = false
+	add_child(sprite)
+	return sprite
+
+
+func _slam_indicator_create() -> void:
+	slam_indicator = _make_floor_circle(SLAM_RANGE)
+
+
+func _melee_indicator_create() -> void:
+	melee_indicator = _make_floor_circle(MELEE_RANGE)
 
 
 func take_damage(amount: float):
