@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/ShopItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/large.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Bear Trap"
+rarity = ExtResource("2")
+description = "Place on ground; stuns enemies for 3s when stepped on"
+price = 55
+item_type = "combat_tool"
+class_restriction = ""

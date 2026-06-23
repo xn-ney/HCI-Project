@@ -1,4 +1,4 @@
-extends CharacterBody3D
+﻿extends CharacterBody3D
 
 # Camera ------------------------------------------
 var sensitivity = 0.003
@@ -55,6 +55,21 @@ var hp = 100.0
 var max_hp = 100.0
 @onready var hp_label = $HUD/HPLabel
 
+# Inventory ----------------------------------------
+var inventory: Array = [null, null, null, null, null]
+var inv_slot_labels: Array = []
+
+# Shield -------------------------------------------
+var shield_hits: int = 0
+
+# Regen over time ----------------------------------
+var regen_rate: float = 0.0
+var regen_timer: float = 0.0
+
+# Invisibility -------------------------------------
+var is_invisible: bool = false
+var invis_timer: float = 0.0
+
 # I-Frames ----------------------------------------
 const IFRAME_DURATION = 1.5
 var iframe_timer = 0.0
@@ -87,11 +102,12 @@ var speed = 5.0
 const JUMP_VELOCITY = 9.5
 const DJUMP_VELOCITY = 6.8
 
-
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	right_rest_pos = weapon_holder.position
 	_apply_class_stats()
+	GameManager.restore_player_state()
+	_build_inventory_hud()
 
 
 func _cycle_class() -> void:
@@ -141,12 +157,22 @@ func _input(event):
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-60), deg_to_rad(85))
 
 # Terminate Input ---------------------------------
-func _process(_delta):
+func _process(delta):
+	if GameManager.ui_open:
+		_process_effects(delta)
+		return
 	if Input.is_action_just_pressed("terminate"):
 		get_tree().quit()
 	if Input.is_action_just_pressed("switch"):
 		_cycle_class()
-	
+
+	if Input.is_action_just_pressed("item_slot_1"):
+		use_item(0)
+	if Input.is_action_just_pressed("item_slot_2"):
+		use_item(1)
+	if Input.is_action_just_pressed("item_slot_3"):
+		use_item(2)
+
 	var joy_x = Input.get_joy_axis(0, JOY_AXIS_RIGHT_X)
 	var joy_y = Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
 	
@@ -155,9 +181,29 @@ func _process(_delta):
 		camera.rotate_x(-joy_y * sensitivity * 12)
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-60), deg_to_rad(70))
 
+	_process_effects(delta)
+
+
+func _process_effects(delta: float):
+	if regen_timer > 0:
+		regen_timer -= delta
+		hp = min(hp + regen_rate * delta, max_hp)
+		if regen_timer <= 0:
+			regen_rate = 0.0
+
+	if invis_timer > 0:
+		invis_timer -= delta
+		if invis_timer <= 0:
+			is_invisible = false
+
 
 # MOVEMENT ----------------------------------------
 func _physics_process(delta: float) -> void:
+	if GameManager.ui_open:
+		velocity.x = 0
+		velocity.z = 0
+		move_and_slide()
+		return
 	if not is_on_floor():
 		velocity += get_gravity() * delta * 3.0
 
@@ -250,7 +296,7 @@ func _physics_process(delta: float) -> void:
 			stamina += EXHAUSTED_RECOVERY * delta
 			if stamina >= EXHAUSTED_THRESHOLD:
 				is_exhausted = false
-				print("Exhausted state ended — stamina: ", stamina)
+				print("Exhausted state ended ΓÇö stamina: ", stamina)
 	elif is_sprinting:
 		stamina -= active_class.get_sprint_stamina_drain() * delta
 		if stamina <= 0:
@@ -380,6 +426,10 @@ func take_damage(amount: float):
 		if active_class.has_method("on_parry_success") and active_class.get("parry_window"):
 			active_class.on_parry_success()
 		return
+	if shield_hits > 0:
+		shield_hits -= 1
+		print("Shield blocked hit, ", shield_hits, " remaining")
+		return
 	iframe_timer = IFRAME_DURATION
 	var dmg_mult = 1.0
 	if active_class.has_method("get_damage_taken_mult"):
@@ -390,3 +440,188 @@ func take_damage(amount: float):
 	active_class.on_take_damage(amount)
 	if hp <= 0:
 		print("Player died!")
+
+
+# Inventory HUD ------------------------------------
+func _build_inventory_hud():
+	var container = Panel.new()
+	container.name = "InvContainer"
+	container.anchor_left = 0.15
+	container.anchor_right = 0.85
+	container.anchor_top = 0.88
+	container.anchor_bottom = 0.96
+	container.modulate = Color(1, 1, 1, 0.7)
+	$HUD.add_child(container)
+
+	for i in range(5):
+		var slot = Panel.new()
+		slot.name = "Slot" + str(i)
+		slot.anchor_left = i * 0.2
+		slot.anchor_right = (i + 1) * 0.2 - 0.005
+		slot.anchor_top = 0.0
+		slot.anchor_bottom = 1.0
+		slot.modulate = Color(1, 1, 1, 1.0)
+		container.add_child(slot)
+
+		var lbl = Label.new()
+		lbl.name = "Label" + str(i)
+		lbl.anchor_left = 0.0
+		lbl.anchor_right = 1.0
+		lbl.anchor_top = 0.0
+		lbl.anchor_bottom = 1.0
+		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		lbl.add_theme_font_size_override("font_size", 14)
+		lbl.add_theme_color_override("font_color", Color(0.15, 0.15, 0.15))
+		lbl.add_theme_constant_override("outline_size", 1)
+		lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+		lbl.text = ""
+		slot.add_child(lbl)
+		inv_slot_labels.append(lbl)
+
+	_update_inventory_hud()
+
+
+func _update_inventory_hud():
+	for i in range(5):
+		var lbl = inv_slot_labels[i]
+		if not lbl:
+			continue
+		var item = inventory[i] if i < inventory.size() else null
+		if item:
+			var clr = item.rarity.color if item.rarity else Color(1, 1, 1)
+			lbl.add_theme_color_override("font_color", clr)
+			var hotkey = str(i + 3) + ": " if i < 3 else ""
+			lbl.text = hotkey + item.item_name
+		else:
+			var hotkey = str(i + 3) + ": " if i < 3 else ""
+			lbl.add_theme_color_override("font_color", Color(0.15, 0.15, 0.15))
+			lbl.text = hotkey + "Empty"
+
+
+# Add item to inventory (first empty slot) ----------
+func add_item(item: Resource) -> bool:
+	for i in range(inventory.size()):
+		if inventory[i] == null:
+			inventory[i] = item
+			_update_inventory_hud()
+			print("Added ", item.item_name, " to slot ", i + 1)
+			return true
+	print("Inventory full!")
+	return false
+
+
+# Use item from slot --------------------------------
+func use_item(slot: int):
+	if slot < 0 or slot >= inventory.size():
+		return
+	var item = inventory[slot]
+	if not item:
+		print("Slot ", slot + 1, " is empty")
+		return
+	if not _can_use_item(item):
+		return
+	_apply_item_effect(item)
+	inventory[slot] = null
+	_update_inventory_hud()
+
+
+func _can_use_item(item: Resource) -> bool:
+	if item.class_restriction != "":
+		var current_class = active_class.name.replace("Stats", "").to_lower()
+		var restrict = item.class_restriction.to_lower()
+		if restrict == "wrath":
+			restrict = "wraith"
+		if current_class != restrict:
+			var display = restrict.capitalize()
+			print("Only ", display, " can use ", item.item_name)
+			return false
+	return true
+
+
+# Item effect application ---------------------------
+func _apply_item_effect(item: Resource):
+	var tier = item.rarity.sort_order if item.rarity else 0
+	var type = item.item_type
+
+	match type:
+		"potion":
+			_apply_potion(item, tier)
+		"class_potion":
+			_apply_class_potion(item, tier)
+		"combat_tool":
+			_apply_combat_tool(item, tier)
+
+
+# Potion effects ------------------------------------
+func _apply_potion(item: Resource, tier: int):
+	match item.item_name:
+		"Healing Potion":
+			var amounts = [20, 50, 100]
+			var heal = amounts[tier] if tier < amounts.size() else 50
+			hp = min(hp + heal, max_hp)
+			print("Healed for ", heal, " HP")
+		"Stamina Potion":
+			var amounts = [30, 60, max_stamina]
+			var restore = amounts[tier] if tier < amounts.size() else 60
+			stamina = min(stamina + restore, max_stamina)
+			if is_exhausted and stamina >= EXHAUSTED_THRESHOLD:
+				is_exhausted = false
+			print("Restored ", restore, " stamina")
+		"Shield Potion":
+			var hits = [1, 2, 3]
+			shield_hits += hits[tier] if tier < hits.size() else 1
+			print("Gained ", shield_hits, " shield hits")
+		"Regeneration Potion":
+			var rates = [2.0, 5.0, 10.0]
+			var durs = [8.0, 10.0, 12.0]
+			regen_rate = rates[tier] if tier < rates.size() else 5.0
+			regen_timer = durs[tier] if tier < durs.size() else 10.0
+			print("Regen ", regen_rate, " HP/s for ", regen_timer, "s")
+
+
+# Class potion effects ------------------------------
+func _apply_class_potion(item: Resource, tier: int):
+	match item.item_name:
+		"Mana Potion":
+			var amounts = [30, 60, active_class.MAX_MANA]
+			var restore = amounts[tier] if tier < amounts.size() else 60
+			active_class.mana = min(active_class.mana + restore, active_class.MAX_MANA)
+			print("Restored ", restore, " mana")
+		"Calming Potion":
+			var pcts = [0.15, 0.30, 0.50]
+			var reduction = pcts[tier] if tier < pcts.size() else 0.3
+			active_class.influence = max(active_class.influence - active_class.MAX_INFLUENCE * reduction, 0.0)
+			print("Reduced Influence by ", reduction * 100, "%")
+		"Invisibility Potion":
+			var durs = [3.0, 5.0, 8.0]
+			is_invisible = true
+			invis_timer = durs[tier] if tier < durs.size() else 5.0
+			print("Invisible for ", invis_timer, "s")
+
+
+# Combat tool effects -------------------------------
+func _apply_combat_tool(item: Resource, tier: int):
+	match item.item_name:
+		"Bomb":
+			var dmgs = [15, 30, 50]
+			var _rads = [3.0, 4.0, 5.0]
+			var dmg = dmgs[tier] if tier < dmgs.size() else 30
+			var rad = _rads[tier] if tier < _rads.size() else 4.0
+			for enemy in get_tree().get_nodes_in_group("enemies"):
+				if global_position.distance_to(enemy.global_position) <= rad:
+					enemy.take_damage(dmg)
+			print("Bomb: ", dmg, " AOE damage in ", rad, "m")
+		"Smoke Bomb":
+			var durs = [3.0, 5.0, 8.0]
+			var _rads = [3.0, 4.0, 5.0]
+			is_invisible = true
+			invis_timer = durs[tier] if tier < durs.size() else 5.0
+			print("Smoke Bomb: invisible for ", invis_timer, "s")
+		"Bear Trap":
+			var stun_durs = [2.0, 3.0, 5.0]
+			var stun = stun_durs[tier] if tier < stun_durs.size() else 3.0
+			for enemy in get_tree().get_nodes_in_group("enemies"):
+				if global_position.distance_to(enemy.global_position) <= 2.0:
+					enemy.set("stun_timer", stun)
+			print("Bear Trap: stunned enemies for ", stun, "s")

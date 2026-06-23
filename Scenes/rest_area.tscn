@@ -1,0 +1,366 @@
+[gd_scene format=3 uid="uid://byf4bwnnqsjcp"]
+
+[ext_resource type="Texture2D" uid="uid://cp1wfulrmcaqm" path="res://Assets/Textures/Brick_Texture.png" id="1_8j60k"]
+[ext_resource type="PackedScene" uid="uid://ctu0ijhkofc6e" path="res://Scenes/player.tscn" id="1_a02cp"]
+[ext_resource type="PackedScene" path="res://Scenes/campfire.tscn" id="3_o20gp"]
+[ext_resource type="Script" uid="uid://4kaj50o4b385" path="res://Assets/Scripts/Shop/Shopkeeper.gd" id="4_fg42k"]
+[ext_resource type="Resource" path="res://Resources/Items/healing_potion.tres" id="8"]
+[ext_resource type="Resource" path="res://Resources/Items/shield_potion.tres" id="9"]
+[ext_resource type="Resource" path="res://Resources/Items/stamina_potion.tres" id="10"]
+[ext_resource type="Resource" path="res://Resources/Items/regeneration_potion.tres" id="11"]
+[ext_resource type="Resource" path="res://Resources/Items/mana_potion.tres" id="12"]
+[ext_resource type="Resource" path="res://Resources/Items/calming_potion.tres" id="13"]
+[ext_resource type="Resource" path="res://Resources/Items/invisibility_potion.tres" id="14"]
+[ext_resource type="Resource" path="res://Resources/Items/bomb.tres" id="15"]
+[ext_resource type="Resource" path="res://Resources/Items/smoke_bomb.tres" id="16"]
+[ext_resource type="Resource" path="res://Resources/Items/bear_trap.tres" id="17"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
+sky_top_color = Color(0.02, 0.02, 0.05, 1)
+sky_horizon_color = Color(0.03, 0.01, 0.03, 1)
+ground_bottom_color = Color(0.01, 0.01, 0.02, 1)
+ground_horizon_color = Color(0.02, 0, 0.02, 1)
+
+[sub_resource type="Sky" id="Sky_night"]
+sky_material = SubResource("ProceduralSkyMaterial_night")
+
+[sub_resource type="Environment" id="Environment_night"]
+background_mode = 1
+sky = SubResource("Sky_night")
+ambient_light_color = Color(0.02, 0.01, 0.03, 1)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_fo5ed"]
+vertices = PackedVector3Array(-9.5, 0.5, -9.5, -9.5, 0.5, 9.5, 9.5, 0.5, 9.5, 9.5, 0.5, -9.5)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yp4wr"]
+size = Vector3(20, 1, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fo5ed"]
+albedo_texture = ExtResource("1_8j60k")
+uv1_scale = Vector3(2, 2, 2)
+
+[sub_resource type="QuadMesh" id="QuadMesh_go701"]
+size = Vector2(20, 20)
+orientation = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fb"]
+size = Vector3(20, 20, 0.097839355)
+
+[sub_resource type="QuadMesh" id="QuadMesh_fb"]
+size = Vector2(20, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lr"]
+size = Vector3(40, 20, 0.097839355)
+
+[sub_resource type="QuadMesh" id="QuadMesh_lr"]
+size = Vector2(40, 20)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shopkeep"]
+albedo_color = Color(0.6, 0.4, 0.2, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_shopkeep"]
+radius = 0.3
+height = 1.2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_shopkeep"]
+radius = 0.3
+height = 1.2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_zone"]
+radius = 2.0
+height = 4.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_counter"]
+size = Vector3(2.5, 0.9, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.35, 0.2, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_counter_top"]
+size = Vector3(2.5, 0.06, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood_dark"]
+albedo_color = Color(0.2, 0.1, 0.04, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_counter_front"]
+size = Vector3(2.5, 0.7, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_counter_leg"]
+size = Vector3(0.06, 0.7, 0.06)
+
+[sub_resource type="BoxMesh" id="BoxMesh_counter_beam"]
+size = Vector3(2.5, 0.06, 0.06)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_back"]
+size = Vector3(3, 2, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_back"]
+size = Vector3(3, 2, 0.08)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_side"]
+size = Vector3(0.08, 2, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_side"]
+size = Vector3(0.08, 2, 2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_roof_hut"]
+size = Vector3(3.6, 0.04, 2.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_stick"]
+albedo_color = Color(0.25, 0.12, 0.05, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_torch_stick"]
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torch_flame"]
+albedo_color = Color(1, 0.6, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.5, 0.1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_torch_flame"]
+radius = 0.08
+height = 0.2
+
+[node name="RestArea" type="Node3D" unique_id=54928382]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=713916310]
+environment = SubResource("Environment_night")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=546032214]
+transform = Transform3D(-0.707107, 0, -0.707107, -0.497469, -0.71069, 0.497469, -0.502519, 0.703527, 0.502519, 0, 25, 0)
+light_color = Color(0.2, 0.2, 0.3, 1)
+light_energy = 0.3
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=66906496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.011749744, -0.044861674, 0.02150774)
+navigation_mesh = SubResource("NavigationMesh_fo5ed")
+
+[node name="Floor" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1275906443]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Floor" unique_id=321729480]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_yp4wr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Floor" unique_id=1810021605]
+material_override = SubResource("StandardMaterial3D_fo5ed")
+mesh = SubResource("QuadMesh_go701")
+
+[node name="Player" parent="." unique_id=391161488 instance=ExtResource("1_a02cp")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.855, -5)
+
+[node name="Walls" type="Node3D" parent="." unique_id=701720555]
+visible = false
+
+[node name="WallsFront" type="StaticBody3D" parent="Walls" unique_id=463564571]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -9.696, 16, 0.03)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsFront" unique_id=10828429]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
+shape = SubResource("BoxShape3D_fb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsFront" unique_id=571800589]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
+mesh = SubResource("QuadMesh_fb")
+
+[node name="WallsBack" type="StaticBody3D" parent="Walls" unique_id=1554164348]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 9.648, 16, 0.03)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsBack" unique_id=1317815468]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
+shape = SubResource("BoxShape3D_fb")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsBack" unique_id=1673063605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
+mesh = SubResource("QuadMesh_fb")
+
+[node name="WallsLeft" type="StaticBody3D" parent="Walls" unique_id=1076397987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.274, 16, -9.639)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsLeft" unique_id=1949590413]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
+shape = SubResource("BoxShape3D_lr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsLeft" unique_id=1857382241]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
+mesh = SubResource("QuadMesh_lr")
+
+[node name="WallsRight" type="StaticBody3D" parent="Walls" unique_id=411412941]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.274, 16, 9.519)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsRight" unique_id=2119701136]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
+shape = SubResource("BoxShape3D_lr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsRight" unique_id=1119113957]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
+mesh = SubResource("QuadMesh_lr")
+
+[node name="Campfire" parent="." unique_id=186075708 instance=ExtResource("3_o20gp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
+
+[node name="Shop" type="Node3D" parent="." unique_id=1363118248]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+
+[node name="Shopkeeper" type="CharacterBody3D" parent="Shop" unique_id=1406987602]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.3)
+script = ExtResource("4_fg42k")
+item_pool = Array[Resource]([ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("17")])
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Shop/Shopkeeper" unique_id=812067311]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.029844284, 0.19649029, 0)
+material_override = SubResource("StandardMaterial3D_shopkeep")
+mesh = SubResource("CapsuleMesh_shopkeep")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop/Shopkeeper" unique_id=699942100]
+shape = SubResource("CapsuleShape3D_shopkeep")
+
+[node name="InteractionArea" type="Area3D" parent="Shop/Shopkeeper" unique_id=209917377]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop/Shopkeeper/InteractionArea" unique_id=2074883147]
+shape = SubResource("CapsuleShape3D_zone")
+
+[node name="InteractionPrompt" type="Label3D" parent="Shop/Shopkeeper" unique_id=1582545736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+billboard = 1
+vertical_alignment = 2
+
+[node name="ShopCounter" type="StaticBody3D" parent="Shop" unique_id=664123508]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop/ShopCounter" unique_id=1808541546]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -0.8)
+shape = SubResource("BoxShape3D_counter")
+
+[node name="CounterTop" type="MeshInstance3D" parent="Shop/ShopCounter" unique_id=314438369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.85, -0.8)
+material_override = SubResource("StandardMaterial3D_wood")
+mesh = SubResource("BoxMesh_counter_top")
+
+[node name="CounterFront" type="MeshInstance3D" parent="Shop/ShopCounter" unique_id=933632857]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -0.42)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_counter_front")
+
+[node name="LegLeft" type="MeshInstance3D" parent="Shop/ShopCounter" unique_id=1983508094]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.15, 0.38, -0.8)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_counter_leg")
+
+[node name="LegRight" type="MeshInstance3D" parent="Shop/ShopCounter" unique_id=708732370]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.15, 0.38, -0.8)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_counter_leg")
+
+[node name="Beam" type="MeshInstance3D" parent="Shop/ShopCounter" unique_id=1532129965]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04, -0.8)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_counter_beam")
+
+[node name="HutWalls" type="StaticBody3D" parent="Shop" unique_id=1913853652]
+
+[node name="BackWall" type="MeshInstance3D" parent="Shop/HutWalls" unique_id=1233300931]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_wall_back")
+
+[node name="BackWallCollision" type="CollisionShape3D" parent="Shop/HutWalls" unique_id=496826698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1)
+shape = SubResource("BoxShape3D_wall_back")
+
+[node name="LeftWall" type="MeshInstance3D" parent="Shop/HutWalls" unique_id=185789327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.46, 1, 0.1)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_wall_side")
+
+[node name="LeftWallCollision" type="CollisionShape3D" parent="Shop/HutWalls" unique_id=974677702]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.46, 1, 0.1)
+shape = SubResource("BoxShape3D_wall_side")
+
+[node name="RightWall" type="MeshInstance3D" parent="Shop/HutWalls" unique_id=1495148229]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.46, 1, 0.1)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_wall_side")
+
+[node name="RightWallCollision" type="CollisionShape3D" parent="Shop/HutWalls" unique_id=472515930]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.46, 1, 0.1)
+shape = SubResource("BoxShape3D_wall_side")
+
+[node name="Roof" type="MeshInstance3D" parent="Shop/HutWalls" unique_id=1083401309]
+transform = Transform3D(1, 0, 0, 0, 0.85, 0.5, 0, -0.5, 0.85, 0, 2, 0.1)
+material_override = SubResource("StandardMaterial3D_wood_dark")
+mesh = SubResource("BoxMesh_roof_hut")
+
+[node name="TorchLeft" type="Node3D" parent="Shop" unique_id=1471137732]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9, 0, -0.5)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Shop/TorchLeft" unique_id=287293441]
+light_color = Color(1, 0.5, 0.1, 1)
+light_energy = 3.0
+omni_range = 8.0
+
+[node name="Stick" type="MeshInstance3D" parent="Shop/TorchLeft" unique_id=411563685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+material_override = SubResource("StandardMaterial3D_torch_stick")
+mesh = SubResource("CylinderMesh_torch_stick")
+
+[node name="Flame" type="MeshInstance3D" parent="Shop/TorchLeft" unique_id=885660158]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+material_override = SubResource("StandardMaterial3D_torch_flame")
+mesh = SubResource("SphereMesh_torch_flame")
+
+[node name="TorchRight" type="Node3D" parent="Shop" unique_id=281831911]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9, 0, -0.5)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Shop/TorchRight" unique_id=1568809183]
+light_color = Color(1, 0.5, 0.1, 1)
+light_energy = 3.0
+omni_range = 8.0
+
+[node name="Stick" type="MeshInstance3D" parent="Shop/TorchRight" unique_id=1629797836]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+material_override = SubResource("StandardMaterial3D_torch_stick")
+mesh = SubResource("CylinderMesh_torch_stick")
+
+[node name="Flame" type="MeshInstance3D" parent="Shop/TorchRight" unique_id=1655356238]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+material_override = SubResource("StandardMaterial3D_torch_flame")
+mesh = SubResource("SphereMesh_torch_flame")
+
+[node name="TorchPathLeft" type="Node3D" parent="." unique_id=1435070318]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 0.75)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="TorchPathLeft" unique_id=717361618]
+light_color = Color(1, 0.5, 0.1, 1)
+light_energy = 2.5
+omni_range = 6.0
+
+[node name="Stick" type="MeshInstance3D" parent="TorchPathLeft" unique_id=1139877170]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+material_override = SubResource("StandardMaterial3D_torch_stick")
+mesh = SubResource("CylinderMesh_torch_stick")
+
+[node name="Flame" type="MeshInstance3D" parent="TorchPathLeft" unique_id=169369972]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+material_override = SubResource("StandardMaterial3D_torch_flame")
+mesh = SubResource("SphereMesh_torch_flame")
+
+[node name="TorchPathRight" type="Node3D" parent="." unique_id=1916805033]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 0.75)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="TorchPathRight" unique_id=867357270]
+light_color = Color(1, 0.5, 0.1, 1)
+light_energy = 2.5
+omni_range = 6.0
+
+[node name="Stick" type="MeshInstance3D" parent="TorchPathRight" unique_id=114386797]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+material_override = SubResource("StandardMaterial3D_torch_stick")
+mesh = SubResource("CylinderMesh_torch_stick")
+
+[node name="Flame" type="MeshInstance3D" parent="TorchPathRight" unique_id=927242229]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+material_override = SubResource("StandardMaterial3D_torch_flame")
+mesh = SubResource("SphereMesh_torch_flame")

@@ -24,7 +24,7 @@ const CHASE_READY_DELAY = 0.8
 const CHASE_SPEED_MULT = 1.9
 
 # Dash and Slam -------------------------------------
-const DASH_CHANCE = 1
+const DASH_CHANCE = 0.3
 const DASH_CHARGE_TIME = 2.5
 const DASH_SPEED = 30.0
 const DASH_DURATION = 0.35

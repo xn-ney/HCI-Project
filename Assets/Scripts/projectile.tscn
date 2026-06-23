@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://dl07k58083pds"]
+
+[ext_resource type="Script" uid="uid://ckgskcqdxgli6" path="res://Assets/Scripts/projectile.gd" id="1_187u2"]
+[ext_resource type="PackedScene" uid="uid://ccbmikics3pv5" path="res://Assets/Objects/IronDagger.glb" id="2_dbvub"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a4egy"]
+size = Vector3(0.11804199, 0.2775879, 0.33538818)
+
+[node name="Projectile" type="RigidBody3D" unique_id=129464057]
+script = ExtResource("1_187u2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1903626388]
+
+[node name="IronDagger" parent="MeshInstance3D" unique_id=530964079 instance=ExtResource("2_dbvub")]
+transform = Transform3D(-0.099522024, -0.004788775, 0.008510821, -0.009671792, 0.06038303, -0.079122365, -0.0013501048, -0.07956733, -0.060557574, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2032801424]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0035731941, 0.012329102, 0.007965088)
+shape = SubResource("BoxShape3D_a4egy")
