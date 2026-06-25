@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://bi76ge0gwb3sf"]
+[gd_scene format=3 uid="uid://cp588maigp4mi"]
 
-[ext_resource type="Script" uid="uid://cgih8i2v14jm7" path="res://Assets/Scripts/Enemies/orc.gd" id="1_hghv2"]
+[ext_resource type="Script" uid="uid://cgih8i2v14jm7" path="res://Assets/Scripts/Enemies/orc.gd" id="1_f18he"]
 [ext_resource type="PackedScene" uid="uid://duksa08i63i0q" path="res://Assets/3D Models/Orc/Orc.fbx" id="2_atnsl"]
 [ext_resource type="PackedScene" uid="uid://dpen8y52h4nrv" path="res://Assets/3D Models/Orc/Iron_Cleaver.fbx" id="3_1o42f"]
 
@@ -9,7 +9,7 @@ height = 2.107
 
 [node name="Orc" type="CharacterBody3D" unique_id=831934320 groups=["enemies"]]
 collision_layer = 8
-script = ExtResource("1_hghv2")
+script = ExtResource("1_f18he")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=254163438]
 shape = SubResource("CapsuleShape3D_0oxh4")

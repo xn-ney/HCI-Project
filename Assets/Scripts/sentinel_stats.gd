@@ -138,6 +138,7 @@ func melee_attack() -> void:
 		push_dir.y = 0.0
 		body.set("impulse", Vector3.UP * BANISHMENT_KNOCKUP)
 		body.set("knockback_velocity", push_dir * BANISHMENT_PUSH)
+		body.set("stunned_timer", 1.2)
 		if not body.is_in_group("branded") and not first_unbranded:
 			first_unbranded = body
 		if not first_branded:
@@ -248,6 +249,8 @@ func ult() -> void:
 			if stored != null:
 				stored_speeds[body] = stored
 				body.set("speed_multiplier", 0.0)
+				body.set("stunned_timer", 2.0)
+				body.set("disengage_timer", JUDGEMENT_STUN_DURATION)
 				affected.append(body)
 	await get_tree().create_timer(JUDGEMENT_STUN_DURATION).timeout
 	for body in affected:

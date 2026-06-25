@@ -3,7 +3,7 @@ extends BaseCondition
 
 # Preloads -----------------------------------------
 const ENEMY_SCENES = [
-	preload("res://Scenes/Enemies/orc_brute.tscn"),
+	preload("res://Scenes/Enemies/orc.tscn"),
 ]
 
 # Wave config --------------------------------------

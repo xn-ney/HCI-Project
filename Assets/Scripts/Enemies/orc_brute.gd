@@ -62,6 +62,8 @@ var knockback_velocity = Vector3.ZERO
 var impulse = Vector3.ZERO
 var branded_timer = 0.0
 var speed_multiplier = 1.0
+var stunned_timer = 0.0
+var disengage_timer = 0.0
 var dash_dir = Vector3.ZERO
 
 # References ----------------------------------------
@@ -106,6 +108,18 @@ func _physics_process(delta: float) -> void:
 		if branded_timer <= 0:
 			remove_from_group("branded")
 
+	if stunned_timer > 0:
+		stunned_timer -= delta
+
+	if disengage_timer > 0:
+		disengage_timer -= delta
+		if disengage_timer <= 0:
+			if state == State.ATTACK:
+				_attack_finished(global_position.distance_to(player.global_position))
+			elif state == State.PREPARE:
+				state_timer = PREPARE_DURATION
+				_prepare_enter()
+
 	var distance = global_position.distance_to(player.global_position)
 
 	# Lose aggro if too far -------------------------
@@ -114,7 +128,7 @@ func _physics_process(delta: float) -> void:
 			state = State.IDLE
 			_idle_pick_wander()
 
-	var can_act = speed_multiplier > 0 and knockback_velocity.length() <= 0.1
+	var can_act = speed_multiplier > 0 and knockback_velocity.length() <= 0.1 and stunned_timer <= 0
 
 	if can_act:
 		match state:
@@ -259,6 +273,10 @@ func _physics_process(delta: float) -> void:
 		velocity.x = knockback_velocity.x
 		velocity.z = knockback_velocity.z
 		knockback_velocity = knockback_velocity.lerp(Vector3.ZERO, KNOCKBACK_FRICTION * delta)
+
+	if speed_multiplier <= 0 and knockback_velocity.length() <= 0.1:
+		velocity.x = 0.0
+		velocity.z = 0.0
 
 	_separate_from_others()
 

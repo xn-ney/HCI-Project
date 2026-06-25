@@ -147,6 +147,7 @@ func process_class(delta: float) -> void:
 				if body.is_on_floor() and player.global_position.distance_to(body.global_position) <= INNER_STRENGTH_RADIUS:
 					body.take_damage(_get_damage(INNER_STRENGTH_DAMAGE))
 					body.set("impulse", Vector3.UP * INNER_STRENGTH_KNOCKUP)
+				body.set("stunned_timer", 1.5)
 			print("Vessel: Inner Strength unleashed")
 
 	# Passive decay (paused during forced decay) -----
@@ -193,6 +194,7 @@ func process_class(delta: float) -> void:
 				push_dir.y = 0.0
 				body.set("impulse", Vector3.UP * 8.0)
 				body.set("knockback_velocity", push_dir * RAMPAGE_PUSH)
+				body.set("stunned_timer", 0.8)
 				rampage_hit.append(body)
 	else:
 		rampage_hit.clear()
@@ -266,6 +268,7 @@ func ranged_attack() -> void:
 		var push_dir = (body.global_position - player.global_position).normalized()
 		push_dir.y = 0.0
 		body.set("knockback_velocity", push_dir * OUTBURST_PUSH)
+		body.set("stunned_timer", 0.8)
 		if lifesteal_timer > 0:
 			var heal = (player.max_hp - player.hp) * ROAR_LIFESTEAL_PCT
 			player.hp = min(player.hp + heal, player.max_hp)

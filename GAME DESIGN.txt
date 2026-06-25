@@ -1,20 +1,11 @@
 GAME DESIGN KINEME
 
-Those that has '(?)' means that it may be changed later
-
-GENRE: Rougelike, First-Person Shooter, Dark Fantasy-ish
+GENRE: Rougelike, First-Person Shooter, Fantasy
 
 ARTSTYLE: Firs-Person 2.5D, Pixel art or Retro(?)
 
 SETTING/PLOT/ENVIRONMENT:
-- Inside a giant 10 Floor tower
-- So iintegrated ko dito yung first idea ko, yung 'Virus' kineme. So nandito na ulit yung plant-based virus, but this time hindi na iintindihin gaano yung story, focus na sa gameplay
-
-VIRUS BACKGROUND(Di na to iintindihin lang, lagay ko lang dito para may idea yung artists and SFX kung pano gagawin nila):
-- This Virus is caused by a mistake, by a failed experiment, as per Arvin the niga. Since plant-like to, maybe nag experiment mga scientist to try and prolong human life by trying to cross hybrid us humans with some kinda plant? idk. 
-Anyway, isip tayo ng way or symbol na madaling ma rrecognize ng player na living being yung virus, maybe enemies has a red and yellow colored, glowing flower sa katawan nila or mag iiba color ng hair nila?
-As per the effects ng Virus, basically parang zombies hehe. Like once infected ka, may flower agad na mag sstart tumubo somewhere on ur body, and once nag bloom yung flower, its the moment u die, basically acting like a timer. 
-
+- Inside a giant 15 Floor tower
 
 CORE IDEA:
 - The player has three classes to choose form, each with their own unique set of abilities and class specific buffs.
@@ -38,7 +29,7 @@ CORE IDEA:
 
 - Each class has two Basic attacks, a ranged and a melee, along with a basic skill and an Ult that slowly charges over time(?), and some will also have a unique dash 
 mechanic. The classes are as follows:
-(tba)
+
 1. Sentinel
 - Unique Resource/Mechanic/Stats: 
   > Mana - Skill requirement, can be recovered by standing in Magic circles.
@@ -85,48 +76,34 @@ mechanic. The classes are as follows:
   > Influence - Charges every time HP is lost. The more enemies hit, the more 'Influence' builds up. Loses 'Influence' by healing or not attacking.
   > Berserk state - At 80% - 99%, enters 'Berserk' state. All damage is increased to 1.5x.
   > Consumed state - At 100% enter 'Consumed' state. Takes 2x damage, cannot 'Sprint', and all abilities has their cooldown doubled except for 'Feral Swing' and 'Rampage"
-  > All abilities except or dash consumes a portion of HP.
-  > Highest DPS, rewards staying in the middle of the battle but requires managing 'Influence'.
+  > Highest DPS, rewards staying in the middle of the battle but requires managing 'Influence', a built-in punishment mechanic.
 
 - Abilities:
   > Left Click/Melee: "Feral Swing" [Burst, AOE]
 	- High damage, knocks enemies back. 
-	- During consumed, cooldown is removed and damage is doubled.
+	- During consumed, attack speed and damage is doubled.
   > Right Click/Ranged: "Outburst" [Burst, AOE]
 	- Mid-Ranged attack.
-  > 'Q'/Skill: "Blast" [AOE, Buff]
-	- Deals damage around the player, heals HP for each enemy hit.
+  > 'Q'/Skill: "Roar" [AOE, Buff]
+	- Gives all attacks a life steal effect, heals HP for each enemy hit.
   > 'E'/Ult: "Bloom" [Buff]
 	- Activate condition: Can be cast when 'Influence' is less than 80%
 	- Charges 'Influence' by 20% in exchange for a huge portion of HP.
+  > Ult Phase 2: "Inner Strength" [CC, Burst]
+        - Activate condition: Can be cast when 'Influence' is at >80%
+        - Charges for a short time and slams the ground, knocking enemies airborne 
   > Shift/Dash: "Rampage'[AOE, Crowd Control]
 	- Dash is slightly extended, deals damage on contact, and knocks enemies back.
 
-CLASS GAMEPLAY IDEA:
-1. Exorcist:
-> Has Mana(?)
-> Relies heavily in defensive abilities, keeping dangers from going near the player.
-> this class is specifically for "non-gamer players".
-
-2. Assassin
-> Skill based and movement focused class, has more stamina
-> heavily reduced defense and HP and attack but has some "auto kill" condition skills
-
-3. Brawler
-> Is infected by the virus, this class will have to micro manage a virus-based resource. 
-> Kumbaga ito yung character na nandun sa unang suggestion ko, "Virus"
-> Each use of his abilities will rapidly fill the Infection gauge(?). This gauge will also rapidly go back after 2secs of not using any skills
-> Since this is a class that ignores survivability, bibigyan to ng abilties na kayang mag heal
-
 
 FLOOR MECHANICS
-- The game has 11(?) floors. Every 2 floors, the players is given the choice to choose from 3 buffs(class specific) that changes or adds effects of their toolkits
+- The game has 15(?) floors. Every 2 floors, the players is given the choice to choose from 3 buffs(class specific) that changes or adds effects of their toolkits
 
-- The rooms will be random, we will create more than 5 templates shared by these three clear conditions that will randomly be chosen each floor:
+- The rooms will be random, we will create more than 5(?) templates shared by these three clear conditions that will randomly be chosen each floor:
 
 - Each floor will have a different clear condition:
 1. Ambush:
-  > There will be two waves of enemies, each lasting for 60 seconds. Survive and the floor is cleared
+  > There will be two huge waves of enemies, each lasting for 60 seconds. Survive and the floor is cleared
 2. Cleanse:
   > There will be magic circles randomly spawning in the floor, each lasting for 15 Secs.
   > Standing in these magic circles will fill up a bar over time, the player needs a total of 20 secs standing in a circle.
@@ -139,30 +116,30 @@ FLOOR MECHANICS
   > During this, enemies will continuously rush towards the NPC, the closer it gets to the exit, the more enemy there will be.
   > Once the NPC reaches the exit, the enemies will stop respawning. Clear the remaining enemies and the floor is cleared
 
-- We'll also have three special floors:
-4. Retrieval:
-  > Get an item to open the gate to the next floor.
-  > Has semi-platforming elements.
-  > In this floor type, all enemies will have their movement speed increased by 20% and will continuously spawn until the player opens the gate
-  > Will have unique floor templates
-  > Open the gate and the floor is cleared. Once the floor is cleared, all enemies dies.
+- We'll also have two special floors:
+
+4. Rest room:
+- At floors 5 and 10, the player can visit a shop to buy consumables. There will also be a campfire, the player can choose one from two actions to do here(they can only choose one, choosing an action locks the other choice):
+1. Meditate: Choose from 1 from 3 buffs
+2. Rest: Heal 60% lost HP
 
 5. Boss room:
   > Will have unique floor templates
 
-- At floors 5 and 10, the player can visit a shop to buy consumables. There will also be an infirmary, the player can choose one from two actions to do here(they can only choose one, choosing an action locks the other choice):
-1. Meditate: Choose from 1 from 3 buffs
-2. Rest: Heal 40%(?) lost HP
-
-- At floor 11, the final boss will be fought:
+- At floor 15, the final boss will be fought:
 1. More than 1 boss will be developed which will be randomly chosen by the system
 2. If possible, lets make more than 1 phase.
-3. The lower the HP of the boss, the more minions will spawn.
-4. Survive the waves of minions and kill the Final boss to clear the run.
+3. Survive the waves of minions and kill the Final boss to clear the run.
 
-- Trials
-  > Available after first boss
-  > Buff
-  > Heavenly restriction
-  > Debuff pero more rewards
 
+- At floor 15, the final boss will be fought:
+1. More than 1 boss will be developed which will be randomly chosen by the system
+2. If possible, lets make more than 1 phase.
+3. Survive the waves of minions and kill the Final boss to clear the run.
+
+- Trials (If we have extra time, which is malabo na atp)
+  > Allows players to add certain conditions in the game:
+  > Example:
+	= More enemies spawn
+	= Lower HP
+	= Etc.
