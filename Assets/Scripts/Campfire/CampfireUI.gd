@@ -14,6 +14,13 @@ func _ready():
 
 func setup(fire: Node):
 	campfire = fire
+	var next_floor = GameManager.current_floor + 1
+	if next_floor > GameManager.TOTAL_FLOORS:
+		title_label.text = "Campfire — Final Floor Clear!"
+	elif next_floor in GameManager.SHOP_FLOORS:
+		title_label.text = "Campfire — Floor " + str(next_floor) + " (Shop)"
+	else:
+		title_label.text = "Campfire — Floor " + str(next_floor)
 
 func _on_rest():
 	if choice_made:

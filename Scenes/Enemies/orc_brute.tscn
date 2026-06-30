@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://dkeoruxgaa48d"]
+
+[ext_resource type="Script" uid="uid://b080jgfgw6c6t" path="res://Assets/Scripts/Enemies/orc_brute.gd" id="1_hghv2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
+height = 2.107
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ne65n"]
+albedo_color = Color(0.8384838, 2.815649e-06, 9.62615e-07, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
+
+[node name="OrcBrute" type="CharacterBody3D" unique_id=322335710 groups=["enemies"]]
+collision_layer = 8
+script = ExtResource("1_hghv2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=254163438]
+shape = SubResource("CapsuleShape3D_0oxh4")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=175773632]
+transform = Transform3D(1, 0, 0, 0, 1.2428017, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_ne65n")
+mesh = SubResource("CapsuleMesh_q26ig")
+
+[node name="ProjectileSpawn" type="Node3D" parent="." unique_id=1388259209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.65345, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=587323435]
+
+[node name="NameLabel" type="Label3D" parent="." unique_id=104041779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.356, 0)
+billboard = 1
+text = "Orc Brute"
+outline_size = 4
+
+[node name="HPLabel" type="Label3D" parent="." unique_id=352974883]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.486, 0)
+billboard = 1
+text = "200"
+font_size = 48
+outline_size = 4

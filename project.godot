@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Rougelike RPG"
-run/main_scene="uid://d5mcvefojdiw"
+run/main_scene="uid://blhgh7qjgke1f"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

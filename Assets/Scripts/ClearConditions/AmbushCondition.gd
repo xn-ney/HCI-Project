@@ -4,28 +4,24 @@ extends BaseCondition
 # Preloads -----------------------------------------
 const ENEMY_SCENES = [
 	preload("res://Scenes/Enemies/orc.tscn"),
+	preload("res://Scenes/Enemies/goblin_scavenger.tscn"),
 ]
 
 # Wave config --------------------------------------
 var total_waves: int = 2
 var current_wave: int = 0
-var wave_duration: float = 60.0
-var wave_timer: float = 0.0
-var enemies_per_wave: Array[int] = [6, 6]
 var active_enemies: Array[Node] = []
+var _spawn_queue: Array[PackedScene] = []
+var _spawn_index: int = 0
+var _spawn_stagger: float = 0.0
+var _wave_time: float = 0.0
 
 # State --------------------------------------------
 var is_wave_active: bool = false
 var is_finished: bool = false
-var spawn_points: Array[Node3D] = []
 
 # Start --------------------------------------------
 func start_condition() -> void:
-	var nodes = get_tree().get_nodes_in_group("spawn_points")
-	for n in nodes:
-		spawn_points.append(n as Node3D)
-	if spawn_points.is_empty():
-		print("No spawn points found — add Marker3D nodes to group 'spawn_points'")
 	player = get_tree().get_first_node_in_group("player")
 	_start_wave()
 
@@ -33,19 +29,23 @@ func start_condition() -> void:
 func _start_wave() -> void:
 	current_wave += 1
 	is_wave_active = true
-	wave_timer = wave_duration
-	var count = enemies_per_wave[current_wave - 1] if current_wave <= enemies_per_wave.size() else 5
+	_wave_time = 0.0
+	var count = randi() % 6 + 10
+	_spawn_queue = []
 	for i in range(count):
-		_spawn_enemy()
-	print("Wave ", current_wave, " — ", count, " enemies")
+		_spawn_queue.append(ENEMY_SCENES[randi() % ENEMY_SCENES.size()])
+	_spawn_index = 0
+	_spawn_stagger = 0.0
+	print("Wave ", current_wave, " — ", count, " enemies queued")
 
-func _spawn_enemy() -> void:
-	if spawn_points.is_empty():
+func _spawn_next() -> void:
+	if _spawn_index >= _spawn_queue.size() or not player:
 		return
-	var spawn: Node3D = spawn_points[randi() % spawn_points.size()]
-	var enemy = ENEMY_SCENES[randi() % ENEMY_SCENES.size()].instantiate()
+	var enemy = _spawn_queue[_spawn_index].instantiate()
+	_spawn_index += 1
 	get_tree().current_scene.add_child(enemy)
-	enemy.global_position = spawn.global_position + Vector3.UP
+	var offset = Vector3(randf_range(-8.0, 8.0), 0, randf_range(-8.0, 8.0))
+	enemy.global_position = player.global_position + offset + Vector3.UP
 	active_enemies.append(enemy)
 
 # Process loop -------------------------------------
@@ -54,9 +54,15 @@ func process_condition(delta: float) -> void:
 		return
 
 	active_enemies = active_enemies.filter(func(e): return is_instance_valid(e))
-	wave_timer -= delta
+	_wave_time += delta
 
-	if active_enemies.is_empty() or wave_timer <= 0:
+	if _spawn_index < _spawn_queue.size():
+		_spawn_stagger -= delta
+		if _spawn_stagger <= 0:
+			_spawn_next()
+			_spawn_stagger = randf_range(0.3, 0.8)
+
+	if active_enemies.is_empty() or _wave_time >= 30.0:
 		is_wave_active = false
 		if current_wave >= total_waves:
 			is_finished = true
@@ -71,4 +77,4 @@ func is_complete() -> bool:
 func get_progress() -> float:
 	if current_wave == 0:
 		return 0.0
-	return (current_wave - 1 + (1.0 - wave_timer / wave_duration)) / float(total_waves)
+	return float(current_wave - 1) / float(total_waves)

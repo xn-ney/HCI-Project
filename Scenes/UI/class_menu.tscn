@@ -1,0 +1,156 @@
+[gd_scene format=3 uid="uid://bgxhiigfjleqh"]
+
+[ext_resource type="Texture2D" uid="uid://l7ykurtlxo6j" path="res://Assets/Objects/1.png" id="1_61txw"]
+[ext_resource type="FontFile" uid="uid://b4hfcujte1q5o" path="res://textures/Pixelmax-Regular.otf" id="2_ghe8d"]
+[ext_resource type="Script" uid="uid://dg3e7sai4wkve" path="res://Assets/Scripts/UI/class_menu.gd" id="3_k5h7d"]
+[ext_resource type="Texture2D" uid="uid://bu4hui1mx1nst" path="res://Assets/Objects/Wraith Icon.png" id="4_e5t7w"]
+[ext_resource type="Texture2D" uid="uid://bn6hthfggvd8a" path="res://Assets/Objects/Sentinel Icon.jpg" id="5_pddfp"]
+[ext_resource type="Texture2D" uid="uid://d0tm8an3ont7c" path="res://Assets/Objects/Tyrant Icon.jpg" id="6_pddfp"]
+[ext_resource type="FontFile" uid="uid://bwbpsna6o6gde" path="res://Assets/Objects/Pixelmax-Regular.otf" id="7_ded2m"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ce3w2"]
+texture = ExtResource("1_61txw")
+modulate_color = Color(1.0324832, 1.0324832, 1.0324832, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ded2m"]
+texture = ExtResource("4_e5t7w")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_6mfvu"]
+texture = ExtResource("5_pddfp")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_subwb"]
+texture = ExtResource("6_pddfp")
+
+[node name="MainMenu" type="Control" unique_id=432279127]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_k5h7d")
+
+[node name="BackgroundBlocker" type="ColorRect" parent="." unique_id=1938475622]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Panel" type="Panel" parent="." unique_id=900074301]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ce3w2")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=749338146]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -444.0
+offset_top = 146.0
+offset_right = 436.0
+offset_bottom = 546.0
+grow_horizontal = 2
+theme_override_constants/separation = 40
+
+[node name="WraithColumn" type="VBoxContainer" parent="HBoxContainer" unique_id=2032497174]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="HBoxContainer/WraithColumn" unique_id=1952384723]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ghe8d")
+theme_override_font_sizes/font_size = 26
+text = "Wraith"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="HBoxContainer/WraithColumn" unique_id=1629415044]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxTexture_ded2m")
+
+[node name="SentinelColumn" type="VBoxContainer" parent="HBoxContainer" unique_id=1518131679]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="HBoxContainer/SentinelColumn" unique_id=1230856406]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ghe8d")
+theme_override_font_sizes/font_size = 26
+text = "Sentinel"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="HBoxContainer/SentinelColumn" unique_id=927662956]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxTexture_6mfvu")
+
+[node name="TyrantColumn" type="VBoxContainer" parent="HBoxContainer" unique_id=691340083]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="HBoxContainer/TyrantColumn" unique_id=310163915]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ghe8d")
+theme_override_font_sizes/font_size = 26
+text = "Tyrant"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Panel" type="Panel" parent="HBoxContainer/TyrantColumn" unique_id=1797600632]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxTexture_subwb")
+
+[node name="Label" type="Label" parent="." unique_id=597727841]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.49800003
+anchor_top = 0.18400002
+anchor_right = 0.49800003
+anchor_bottom = 0.18400002
+offset_left = -141.69604
+offset_top = -64.23201
+offset_right = 141.30396
+offset_bottom = 3.76799
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_ghe8d")
+theme_override_font_sizes/font_size = 42
+text = "Select Class"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="." unique_id=1872909234]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -38.0
+offset_top = -81.0
+offset_right = 38.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("7_ded2m")
+text = "Go back"

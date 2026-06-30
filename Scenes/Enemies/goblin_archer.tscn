@@ -1,29 +1,55 @@
 [gd_scene format=3 uid="uid://b5l1b6iacic0"]
 
-[ext_resource type="Script" path="res://Assets/Scripts/Enemies/goblin_archer.gd" id="1_hghv2"]
+[ext_resource type="Script" uid="uid://cpdok6ikjrge8" path="res://Assets/Scripts/Enemies/goblin_archer.gd" id="1_hghv2"]
+[ext_resource type="PackedScene" uid="uid://vdb4yufvfbm2" path="res://Assets/3D Models/Goblin Archer/Goblin_Archer.fbx" id="2_iyp6h"]
+[ext_resource type="PackedScene" uid="uid://b3l00ttmnk038" path="res://Assets/3D Models/Goblin Archer/Goblin_Recurve_Shortbow.fbx" id="3_qnye3"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
-height = 1.496
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ne65n"]
-albedo_color = Color(0.2878636, 0.51597637, 4.813075e-07, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
+radius = 0.232
+height = 1.0
 
 [node name="Enemy" type="CharacterBody3D" unique_id=906004777 groups=["enemies"]]
 collision_layer = 8
 script = ExtResource("1_hghv2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2128149989]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.04298961, 0)
 shape = SubResource("CapsuleShape3D_0oxh4")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1076851634]
-transform = Transform3D(1, 0, 0, 0, 0.832056, 0, 0, 0, 1, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_ne65n")
-mesh = SubResource("CapsuleMesh_q26ig")
+[node name="Goblin_Archer" parent="." unique_id=777172595 instance=ExtResource("2_iyp6h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00075542927, -0.46263427, 0.06033063)
+
+[node name="metarig" parent="Goblin_Archer" index="0" unique_id=1946106877]
+transform = Transform3D(1, 0, 0, 0, -1.1920929e-07, 0.99999994, 0, -0.99999994, -1.1920929e-07, -3.3933578e-08, -0.0061398298, -0.0006910735)
+
+[node name="Skeleton3D" parent="Goblin_Archer/metarig" index="0" unique_id=92736626]
+bones/7/rotation = Quaternion(-0.5951993, -0.3952306, -0.4699021, 0.5183846)
+bones/8/rotation = Quaternion(0.14441298, 0.776381, -0.017718004, 0.6132403)
+bones/9/rotation = Quaternion(-3.81025e-09, -0.13958913, 2.9802322e-08, 0.9902095)
+bones/11/rotation = Quaternion(-0.5951992, 0.39523056, 0.46990216, 0.51838464)
+bones/12/rotation = Quaternion(0.14441292, -0.7763809, 0.017717857, 0.61324036)
+bones/13/rotation = Quaternion(-3.81025e-09, 0.13958913, -2.9802322e-08, 0.9902095)
+bones/17/rotation = Quaternion(0.9695124, 5.393315e-08, 8.199827e-09, 0.24504244)
+bones/18/rotation = Quaternion(0.2938328, -5.6287277e-09, -1.6754227e-09, 0.95585686)
+bones/19/rotation = Quaternion(-0.493408, -1.827975e-08, 3.7388308e-08, 0.86979806)
+bones/22/rotation = Quaternion(0.9695126, 1.8402486e-07, 2.2095923e-08, 0.24504179)
+bones/23/rotation = Quaternion(0.29383314, 4.442037e-08, 1.612691e-08, 0.95585674)
+bones/24/rotation = Quaternion(-0.49340883, -7.012421e-08, 1.4387308e-07, 0.8697976)
+bones/25/rotation = Quaternion(-1.0016324e-07, 0.92308426, -0.38459778, -1.6919867e-07)
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Goblin_Archer/metarig/Skeleton3D" index="0" unique_id=989233349]
+transform = Transform3D(0.11729857, -0.98512286, -0.12559672, 0.046887223, 0.13182212, -0.9901639, 0.99198866, 0.11025596, 0.06165221, -0.36027867, 0.009700252, 0.5553742)
+bone_name = "hand.R"
+bone_idx = 14
+
+[node name="Goblin_Recurve_Shortbow" parent="Goblin_Archer/metarig/Skeleton3D/BoneAttachment3D" unique_id=2098585743 instance=ExtResource("3_qnye3")]
+transform = Transform3D(-0.06543513, 0.9972587, 0.03456348, 0.12106244, -0.026447829, 0.9922925, 0.99048585, 0.06911513, -0.11899993, 0.119635865, 0.033632696, 0.018422313)
 
 [node name="ProjectileSpawn" type="Node3D" parent="." unique_id=910235983]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.43748, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=695823471]
+root_node = NodePath("../Goblin_Archer/metarig/Skeleton3D")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1071693754]
 
@@ -39,3 +65,5 @@ billboard = 1
 text = "200"
 font_size = 48
 outline_size = 4
+
+[editable path="Goblin_Archer"]

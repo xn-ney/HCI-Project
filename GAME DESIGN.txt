@@ -71,7 +71,7 @@ mechanic. The classes are as follows:
   > Shift/Dash: "Phantom" [Buff]
 	- While dashing, immune to all damage.
 
-3. Vessel
+3. Tyrant
 - Unique Resource/Mechanic/Stats:
   > Influence - Charges every time HP is lost. The more enemies hit, the more 'Influence' builds up. Loses 'Influence' by healing or not attacking.
   > Berserk state - At 80% - 99%, enters 'Berserk' state. All damage is increased to 1.5x.
@@ -82,11 +82,12 @@ mechanic. The classes are as follows:
   > Left Click/Melee: "Feral Swing" [Burst, AOE]
 	- High damage, knocks enemies back. 
 	- During consumed, attack speed and damage is doubled.
-  > Right Click/Ranged: "Outburst" [Burst, AOE]
+  > Right Click/Ranged: "Thunder Clap" [Burst, AOE]
 	- Mid-Ranged attack.
-  > 'Q'/Skill: "Roar" [AOE, Buff]
-	- Gives all attacks a life steal effect, heals HP for each enemy hit.
-  > 'E'/Ult: "Bloom" [Buff]
+  > 'Q'/Skill: "Bloodlust" [AOE, Buff]
+	- Enters "Bloodlust" state
+	- Bloodlust: Gives all attacks a life steal effect, heals HP for each enemy hit.
+  > 'E'/Ult: "Incite" [Buff]
 	- Activate condition: Can be cast when 'Influence' is less than 80%
 	- Charges 'Influence' by 20% in exchange for a huge portion of HP.
   > Ult Phase 2: "Inner Strength" [CC, Burst]

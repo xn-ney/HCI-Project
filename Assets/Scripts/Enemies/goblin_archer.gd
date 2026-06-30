@@ -52,10 +52,15 @@ var disengage_timer = 0.0
 
 # References ----------------------------------------
 var player = null
+var _original_player = null
+var _target_override: Node3D = null
+var _npc_check_done: bool = false
 
 @onready var nav_agent = $NavigationAgent3D
 @onready var hp_label = $HPLabel
 @onready var projectile_spawn = $ProjectileSpawn
+@onready var anim_player = $AnimationPlayer
+@onready var skeleton = $Goblin_Archer/metarig/Skeleton3D
 
 # State machine -------------------------------------
 enum State { IDLE, ATTACK, REPOSITION, FLEE, INTERRUPTED }
@@ -74,12 +79,22 @@ var hit_count = 0
 
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
+	_original_player = player
 	_idle_pick_wander()
+	_setup_animations()
 
 
 func _physics_process(delta: float) -> void:
 	if player == null:
 		return
+
+	if _target_override:
+		if not is_instance_valid(_target_override) or EscortCondition.escort_target == null:
+			_target_override = null
+			_npc_check_done = true
+			player = _original_player
+		else:
+			player = _target_override
 
 	if branded_timer > 0:
 		branded_timer -= delta
@@ -260,14 +275,20 @@ func _physics_process(delta: float) -> void:
 		velocity.z = 0.0
 
 	_separate_from_others()
+	_update_animation()
 
 	velocity += get_gravity() * delta * 3.0
 	move_and_slide()
 
 
 func _idle_pick_wander() -> void:
-	var angle = randf_range(0, TAU)
-	wander_dir = Vector3(cos(angle), 0, sin(angle)).normalized()
+	if player and randf() < 0.4:
+		var to_player = (player.global_position - global_position).normalized()
+		to_player.y = 0.0
+		wander_dir = to_player
+	else:
+		var angle = randf_range(0, TAU)
+		wander_dir = Vector3(cos(angle), 0, sin(angle)).normalized()
 	wander_walk_timer = randf_range(IDLE_WALK_MIN, IDLE_WALK_MAX)
 	wander_phase = WanderPhase.WALK
 
@@ -303,6 +324,70 @@ func knocked_airborne(duration: float, knockup_force: float) -> void:
 func restore_from_airborne(orig_speed: float) -> void:
 	speed_multiplier = orig_speed
 	stunned_timer = 0.0
+
+func switch_to_npc_target(npc_node: Node3D):
+	if _npc_check_done:
+		return
+	_npc_check_done = true
+	_target_override = npc_node
+	player = _target_override
+
+func _setup_animations() -> void:
+	var paths = {
+		idle = "res://Assets/3D Models/Orc/Animations/Orc Idle.fbx",
+		walk_forward = "res://Assets/3D Models/Orc/Animations/Orc Forward Walk.fbx",
+	}
+	var lib = AnimationLibrary.new()
+	for anim_name in paths:
+		var fbx = load(paths[anim_name]) as PackedScene
+		if not fbx:
+			continue
+		var temp = fbx.instantiate()
+		var src_player = temp.find_child("AnimationPlayer", true, false) as AnimationPlayer
+		if src_player and src_player.has_animation("mixamo_com"):
+			var anim = src_player.get_animation("mixamo_com").duplicate(true)
+			anim.loop_mode = Animation.LOOP_LINEAR
+			for i in range(anim.get_track_count() - 1, -1, -1):
+				var p = str(anim.track_get_path(i))
+				if p == "metarig":
+					anim.remove_track(i)
+				elif p.begins_with("metarig/Skeleton3D:"):
+					anim.track_set_path(i, NodePath(":" + p.trim_prefix("metarig/Skeleton3D:")))
+			lib.add_animation(anim_name, anim)
+		temp.queue_free()
+	anim_player.add_animation_library("", lib)
+	anim_player.play("idle")
+
+
+func _dir_anim(move_dir: Vector3) -> String:
+	if move_dir.length() < 0.1:
+		return "idle"
+	return "walk_forward"
+
+
+func _update_animation() -> void:
+	var anim = "idle"
+	if speed_multiplier <= 0 or knockback_velocity.length() > 0.1 or stunned_timer > 0:
+		anim = "idle"
+	else:
+		match state:
+			State.IDLE:
+				match wander_phase:
+					WanderPhase.WALK:
+						anim = _dir_anim(wander_dir)
+					WanderPhase.PAUSE:
+						anim = "idle"
+			State.ATTACK:
+				anim = "idle"
+			State.REPOSITION:
+				anim = "walk_forward"
+			State.FLEE:
+				anim = "walk_forward"
+			State.INTERRUPTED:
+				anim = "idle"
+	if anim_player.current_animation != anim:
+		anim_player.play(anim)
+
 
 func _become_corpse():
 	remove_from_group("enemies")

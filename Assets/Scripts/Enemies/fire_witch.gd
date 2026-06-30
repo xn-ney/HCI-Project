@@ -61,6 +61,9 @@ var disengage_timer = 0.0
 
 # References ----------------------------------------
 var player = null
+var _original_player = null
+var _target_override: Node3D = null
+var _npc_check_done: bool = false
 
 @onready var nav_agent = $NavigationAgent3D
 @onready var hp_label = $HPLabel
@@ -90,6 +93,7 @@ var sphere_radius: float
 
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
+	_original_player = player
 	var temp = PROJECTILE_SCENE.instantiate()
 	sphere_radius = temp.get_node("SphereCollision").shape.radius
 	temp.free()
@@ -99,6 +103,14 @@ func _ready():
 func _physics_process(delta: float) -> void:
 	if player == null:
 		return
+
+	if _target_override:
+		if not is_instance_valid(_target_override) or EscortCondition.escort_target == null:
+			_target_override = null
+			_npc_check_done = true
+			player = _original_player
+		else:
+			player = _target_override
 
 	if branded_timer > 0:
 		branded_timer -= delta
@@ -290,8 +302,13 @@ func _start_attack(distance: float) -> void:
 
 
 func _idle_pick_wander() -> void:
-	var angle = randf_range(0, TAU)
-	wander_dir = Vector3(cos(angle), 0, sin(angle)).normalized()
+	if player and randf() < 0.4:
+		var to_player = (player.global_position - global_position).normalized()
+		to_player.y = 0.0
+		wander_dir = to_player
+	else:
+		var angle = randf_range(0, TAU)
+		wander_dir = Vector3(cos(angle), 0, sin(angle)).normalized()
 	wander_walk_timer = randf_range(IDLE_WALK_MIN, IDLE_WALK_MAX)
 	wander_phase = WanderPhase.WALK
 
@@ -419,6 +436,13 @@ func knocked_airborne(duration: float, knockup_force: float) -> void:
 func restore_from_airborne(orig_speed: float) -> void:
 	speed_multiplier = orig_speed
 	stunned_timer = 0.0
+
+func switch_to_npc_target(npc_node: Node3D):
+	if _npc_check_done:
+		return
+	_npc_check_done = true
+	_target_override = npc_node
+	player = _target_override
 
 func _become_corpse():
 	remove_from_group("enemies")

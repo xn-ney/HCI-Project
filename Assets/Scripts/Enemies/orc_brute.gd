@@ -68,6 +68,9 @@ var dash_dir = Vector3.ZERO
 
 # References ----------------------------------------
 var player = null
+var _original_player = null
+var _target_override: Node3D = null
+var _npc_check_done: bool = false
 var slam_indicator: Sprite3D = null
 var melee_indicator: Sprite3D = null
 
@@ -75,7 +78,7 @@ var melee_indicator: Sprite3D = null
 @onready var hp_label = $HPLabel
 
 # State machine -------------------------------------
-enum State { IDLE, PREPARE, ATTACK }
+enum State { IDLE, SPAWNCHASE, PREPARE, ATTACK }
 enum AttackPhase { CHASE, CHASE_READY, DASH_CHARGE, DASHING, SLAMMING }
 enum PreparePhase { WALK, PAUSE }
 
@@ -94,7 +97,12 @@ var wander_dir = Vector3.ZERO
 
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
-	_idle_pick_wander()
+	_original_player = player
+	if EscortCondition.spawnchase_enabled:
+		state = State.SPAWNCHASE
+	else:
+		state = State.IDLE
+		_idle_pick_wander()
 	_slam_indicator_create()
 	_melee_indicator_create()
 
@@ -102,6 +110,14 @@ func _ready():
 func _physics_process(delta: float) -> void:
 	if player == null:
 		return
+
+	if _target_override:
+		if not is_instance_valid(_target_override) or EscortCondition.escort_target == null:
+			_target_override = null
+			_npc_check_done = true
+			player = _original_player
+		else:
+			player = _target_override
 
 	if branded_timer > 0:
 		branded_timer -= delta
@@ -124,7 +140,7 @@ func _physics_process(delta: float) -> void:
 
 	# Lose aggro if too far -------------------------
 	if distance > AGGRO_LOSS_RANGE:
-		if state != State.IDLE and state != State.ATTACK:
+		if state != State.IDLE and state != State.SPAWNCHASE and state != State.ATTACK:
 			state = State.IDLE
 			_idle_pick_wander()
 
@@ -132,6 +148,22 @@ func _physics_process(delta: float) -> void:
 
 	if can_act:
 		match state:
+			State.SPAWNCHASE:
+				var move_speed = MOVE_SPEED * speed_multiplier * CHASE_SPEED_MULT
+				if is_in_group("branded"):
+					move_speed *= 0.85
+				nav_agent.target_position = player.global_position
+				var next_pos = nav_agent.get_next_path_position()
+				var move_dir = (next_pos - global_position).normalized()
+				velocity.x = move_dir.x * move_speed
+				velocity.z = move_dir.z * move_speed
+				if distance <= MELEE_RANGE:
+					state = State.ATTACK
+					attack_phase = AttackPhase.CHASE_READY
+					state_timer = CHASE_READY_DELAY
+					velocity = Vector3.ZERO
+					melee_indicator.visible = true
+
 			State.IDLE:
 				if distance <= DETECTION_RANGE:
 					state = State.ATTACK
@@ -320,19 +352,21 @@ func _melee_attack() -> void:
 	if global_position.distance_to(player.global_position) > MELEE_RANGE:
 		return
 	player.take_damage(MELEE_DAMAGE)
-	var push_dir = (player.global_position - global_position).normalized()
-	push_dir.y = 0.0
-	player.knockback_velocity = push_dir * MELEE_KNOCKBACK
+	if player.is_in_group("player"):
+		var push_dir = (player.global_position - global_position).normalized()
+		push_dir.y = 0.0
+		player.knockback_velocity = push_dir * MELEE_KNOCKBACK
 
 
 func _slam_attack() -> void:
 	if global_position.distance_to(player.global_position) > SLAM_RANGE:
 		return
 	player.take_damage(SLAM_DAMAGE)
-	player.knock_up = SLAM_KNOCKUP
-	var push_dir = (player.global_position - global_position).normalized()
-	push_dir.y = 0.0
-	player.knockback_velocity = push_dir * SLAM_KNOCKBACK
+	if player.is_in_group("player"):
+		player.knock_up = SLAM_KNOCKUP
+		var push_dir = (player.global_position - global_position).normalized()
+		push_dir.y = 0.0
+		player.knockback_velocity = push_dir * SLAM_KNOCKBACK
 
 
 func _separate_from_others() -> void:
@@ -379,6 +413,18 @@ func knocked_airborne(duration: float, knockup_force: float) -> void:
 func restore_from_airborne(orig_speed: float) -> void:
 	speed_multiplier = orig_speed
 	stunned_timer = 0.0
+
+func switch_to_npc_target(npc_node: Node3D):
+	if _npc_check_done:
+		return
+	_npc_check_done = true
+	_target_override = npc_node
+	player = _target_override
+	if state == State.SPAWNCHASE:
+		state = State.PREPARE
+		state_timer = PREPARE_DURATION
+		velocity = Vector3.ZERO
+		_prepare_enter()
 
 func _become_corpse():
 	remove_from_group("enemies")

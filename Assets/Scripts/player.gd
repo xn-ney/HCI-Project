@@ -21,7 +21,7 @@ var sensitivity = 0.003
 @onready var fist_holder = $Camera3D/LWeaponHolder
 
 # Class System ------------------------------------
-@onready var active_class: Node = $WraithStats
+@onready var active_class: Node = _get_class_node()
 
 # Melee Attack Stats ------------------------------
 var melee_attack_speed = 0.5
@@ -102,6 +102,14 @@ var speed = 5.0
 const JUMP_VELOCITY = 9.5
 const DJUMP_VELOCITY = 6.8
 
+func _get_class_node() -> Node:
+	var name = GameManager.selected_class
+	for child in get_children():
+		if child.name.begins_with(name):
+			return child
+	return $WraithStats
+
+
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	right_rest_pos = weapon_holder.position
@@ -163,8 +171,6 @@ func _process(delta):
 		return
 	if Input.is_action_just_pressed("terminate"):
 		get_tree().quit()
-	if Input.is_action_just_pressed("switch"):
-		_cycle_class()
 
 	if Input.is_action_just_pressed("item_slot_1"):
 		use_item(0)

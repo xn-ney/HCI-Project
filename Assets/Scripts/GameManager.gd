@@ -14,6 +14,9 @@ var ui_open: bool = false
 const COMBAT_SCENE: String = "res://Scenes/world.tscn"
 const REST_SCENE: String = "res://Scenes/rest_area.tscn"
 
+const TOTAL_FLOORS: int = 15
+const SHOP_FLOORS: Array[int] = [5, 10, 14]
+
 # Saved player state (persists across scene changes)
 var saved_hp: float = -1.0
 var saved_max_hp: float = -1.0
@@ -21,15 +24,14 @@ var saved_stamina: float = -1.0
 var saved_max_stamina: float = -1.0
 var saved_inventory: Array = []
 
+var selected_class: String = "Wraith"
+
 # Condition registry -------------------------------
 var condition_scripts: Dictionary = {
 	1: AmbushCondition,
 	2: CleanseCondition,
+	3: EscortCondition,
 }
-
-# Auto-start on game launch ------------------------
-func _ready():
-	call_deferred("start_run")
 
 # Run lifecycle ------------------------------------
 func start_run():
@@ -38,7 +40,6 @@ func start_run():
 	_roll_condition()
 	print("=== LEVEL START ===")
 	go_to_next_floor()
-
 
 func go_to_next_floor():
 	current_floor += 1
@@ -71,6 +72,9 @@ func restore_player_state():
 func on_floor_cleared():
 	floor_cleared.emit(current_floor)
 	print("Floor ", current_floor, " cleared")
+	if current_floor >= TOTAL_FLOORS:
+		print("=== ALL FLOORS COMPLETE — YOU WIN! ===")
+		return
 	print("=== LEVEL COMPLETE ===")
 	call_deferred("go_to_rest_area")
 
@@ -81,13 +85,25 @@ func go_to_rest_area():
 func advance_from_campfire():
 	current_floor += 1
 	floor_changed.emit(current_floor)
-	_roll_condition()
 	save_player_state()
-	get_tree().change_scene_to_file(COMBAT_SCENE)
+	if current_floor in SHOP_FLOORS:
+		get_tree().change_scene_to_file(REST_SCENE)
+	else:
+		_roll_condition()
+		get_tree().change_scene_to_file(COMBAT_SCENE)
+
+const CONDITION_NAMES: Dictionary = {
+	1: "Ambush",
+	2: "Cleanse",
+	3: "Escort",
+}
 
 # Condition selection ------------------------------
 func _roll_condition():
-	current_condition_type = 2  # Force Cleanse for testing
+	current_condition_type = randi() % 3 + 1
 
 func get_condition_script() -> Script:
 	return condition_scripts.get(current_condition_type, AmbushCondition)
+
+func get_condition_name() -> String:
+	return CONDITION_NAMES.get(current_condition_type, "Ambush")

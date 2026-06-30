@@ -9,7 +9,7 @@
 [ext_resource type="AudioStream" uid="uid://b4kr0q2mqo64d" path="res://Assets/Audio/Walking.mp3" id="6_m3y4k"]
 [ext_resource type="AudioStream" uid="uid://clkvqfk7pw6lh" path="res://Assets/Audio/Sprint.mp3" id="7_m3y4k"]
 [ext_resource type="AudioStream" uid="uid://bwmy8mujupdxe" path="res://Assets/Audio/Dash.mp3" id="8_m3y4k"]
-[ext_resource type="Script" uid="uid://cmwjk1fyp7kv5" path="res://Assets/Scripts/vessel_stats.gd" id="9_vessel"]
+[ext_resource type="Script" uid="uid://cmwjk1fyp7kv5" path="res://Assets/Scripts/tyrant_stats.gd" id="9_tyrant"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yp4wr"]
 radius = 0.4
@@ -67,8 +67,8 @@ shape = SubResource("SphereShape3D_vgqql")
 [node name="SentinelStats" type="Node" parent="." unique_id=1195337276]
 script = ExtResource("5_x3wgy")
 
-[node name="VesselStats" type="Node" parent="." unique_id=123866910]
-script = ExtResource("9_vessel")
+[node name="TyrantStats" type="Node" parent="." unique_id=123866910]
+script = ExtResource("9_tyrant")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=498918574]
 

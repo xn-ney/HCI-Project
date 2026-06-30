@@ -66,6 +66,9 @@ var speed_multiplier = 1.0
 
 # References ----------------------------------------
 var player = null
+var _original_player = null
+var _target_override: Node3D = null
+var _npc_check_done: bool = false
 
 @onready var nav_agent = $NavigationAgent3D
 @onready var hp_label = $HPLabel
@@ -74,7 +77,7 @@ var player = null
 @onready var collision_shape = $CollisionShape3D
 
 # State machine -------------------------------------
-enum State { IDLE, SURPRISED, PREPARE, ATTACK, DEAD }
+enum State { IDLE, SPAWNCHASE, SURPRISED, PREPARE, ATTACK, DEAD }
 enum AttackPhase { CHASE, CHASE_READY, SWING, DODGE }
 enum PreparePhase { WALK, PAUSE }
 
@@ -102,13 +105,26 @@ var swing_anim_name = ""
 
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
-	_idle_pick_wander()
+	_original_player = player
+	if EscortCondition.spawnchase_enabled:
+		state = State.SPAWNCHASE
+	else:
+		state = State.IDLE
+		_idle_pick_wander()
 	_setup_animations()
 
 
 func _physics_process(delta: float) -> void:
 	if player == null:
 		return
+
+	if _target_override:
+		if not is_instance_valid(_target_override) or EscortCondition.escort_target == null:
+			_target_override = null
+			_npc_check_done = true
+			player = _original_player
+		else:
+			player = _target_override
 
 	if branded_timer > 0:
 		branded_timer -= delta
@@ -119,7 +135,7 @@ func _physics_process(delta: float) -> void:
 
 	# Lose aggro if too far -------------------------
 	if distance > AGGRO_LOSS_RANGE:
-		if state != State.IDLE:
+		if state != State.IDLE and state != State.SPAWNCHASE:
 			state = State.IDLE
 			_idle_pick_wander()
 
@@ -145,6 +161,22 @@ func _physics_process(delta: float) -> void:
 
 	if can_act:
 		match state:
+			State.SPAWNCHASE:
+				var move_speed = MOVE_SPEED * speed_multiplier * CHASE_SPEED_MULT
+				if is_in_group("branded"):
+					move_speed *= 0.85
+				nav_agent.target_position = player.global_position
+				var next_pos = nav_agent.get_next_path_position()
+				var move_dir = (next_pos - global_position).normalized()
+				velocity.x = move_dir.x * move_speed
+				velocity.z = move_dir.z * move_speed
+				if distance <= 1.5:
+					state = State.ATTACK
+					attack_phase = AttackPhase.CHASE_READY
+					var ready_delay = EMPOWERED_READY_DELAY if hit_count % 3 == 2 else CHASE_READY_DELAY
+					state_timer = ready_delay
+					velocity = Vector3.ZERO
+
 			State.IDLE:
 				if distance <= DETECTION_RANGE:
 					state = State.SURPRISED
@@ -482,6 +514,8 @@ func _update_animation() -> void:
 		anim = "hurt"
 	else:
 		match state:
+			State.SPAWNCHASE:
+				anim = "chase"
 			State.IDLE:
 				match idle_phase:
 					PreparePhase.WALK:
@@ -516,7 +550,7 @@ func _melee_attack() -> bool:
 	hit_count += 1
 	player.take_damage(MELEE_DAMAGE)
 
-	if hit_count % 3 == 0:
+	if hit_count % 3 == 0 and player.is_in_group("player"):
 		var push_dir = (player.global_position - global_position).normalized()
 		push_dir.y = 0.0
 		player.knockback_velocity = push_dir * MELEE_KNOCKBACK
@@ -547,6 +581,17 @@ func knocked_airborne(duration: float, knockup_force: float) -> void:
 func restore_from_airborne(orig_speed: float) -> void:
 	speed_multiplier = orig_speed
 	stunned_timer = 0.0
+
+func switch_to_npc_target(npc_node: Node3D):
+	if _npc_check_done:
+		return
+	_npc_check_done = true
+	_target_override = npc_node
+	player = _target_override
+	if state == State.SPAWNCHASE:
+		state = State.SURPRISED
+		state_timer = anim_player.get_animation("surprised").length
+		velocity = Vector3.ZERO
 
 func take_damage(amount: float):
 	if is_in_group("branded"):
