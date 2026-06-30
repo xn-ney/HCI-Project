@@ -1,15 +1,16 @@
-[gd_scene format=3 uid="uid://bms8is17u8noy"]
+[gd_scene format=3 uid="uid://b5l1b6iacic0"]
 
-[ext_resource type="Script" uid="uid://cpdok6ikjrge8" path="res://Assets/Scripts/Enemies/goblin_archer.gd" id="1_hghv2"]
+[ext_resource type="Script" path="res://Assets/Scripts/Enemies/goblin_archer.gd" id="1_hghv2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
+height = 1.496
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ne65n"]
-albedo_color = Color(0.8384838, 2.815649e-06, 9.62615e-07, 1)
+albedo_color = Color(0.2878636, 0.51597637, 4.813075e-07, 1)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
 
-[node name="Enemy" type="CharacterBody3D" unique_id=264648624 groups=["enemies"]]
+[node name="Enemy" type="CharacterBody3D" unique_id=906004777 groups=["enemies"]]
 collision_layer = 8
 script = ExtResource("1_hghv2")
 
@@ -17,16 +18,23 @@ script = ExtResource("1_hghv2")
 shape = SubResource("CapsuleShape3D_0oxh4")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1076851634]
+transform = Transform3D(1, 0, 0, 0, 0.832056, 0, 0, 0, 1, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_ne65n")
 mesh = SubResource("CapsuleMesh_q26ig")
 
 [node name="ProjectileSpawn" type="Node3D" parent="." unique_id=910235983]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.5257821, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.43748, 0)
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1071693754]
 
+[node name="NameLabel" type="Label3D" parent="." unique_id=1918679103]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.247, 0)
+billboard = 1
+text = "Goblin Archer"
+outline_size = 4
+
 [node name="HPLabel" type="Label3D" parent="." unique_id=304340931]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.664, 0)
 billboard = 1
 text = "200"
 font_size = 48

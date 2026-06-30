@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bc6sdixmxeouu"]
+
+[ext_resource type="Script" uid="uid://kxsx1x5x6efw" path="res://Assets/Scripts/Enemies/fire_witch.gd" id="1_0ohgh"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r5t7n"]
+albedo_color = Color(0.8392157, 0.54509807, 0, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
+
+[node name="FireWitch" type="CharacterBody3D" unique_id=923788482 groups=["enemies"]]
+collision_layer = 8
+script = ExtResource("1_0ohgh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2128149989]
+shape = SubResource("CapsuleShape3D_0oxh4")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1076851634]
+material_override = SubResource("StandardMaterial3D_r5t7n")
+mesh = SubResource("CapsuleMesh_q26ig")
+
+[node name="ProjectileSpawn" type="Node3D" parent="." unique_id=910235983]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.5257821, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1071693754]
+
+[node name="NameLabel" type="Label3D" parent="." unique_id=987828806]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+billboard = 1
+text = "Fire Witch"
+outline_size = 4
+
+[node name="HPLabel" type="Label3D" parent="." unique_id=304340931]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+billboard = 1
+text = "200"
+font_size = 48
+outline_size = 4

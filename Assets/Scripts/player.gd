@@ -1,4 +1,4 @@
-extends CharacterBody3D
+﻿extends CharacterBody3D
 
 # Camera ------------------------------------------
 var sensitivity = 0.003
@@ -71,7 +71,7 @@ var is_invisible: bool = false
 var invis_timer: float = 0.0
 
 # I-Frames ----------------------------------------
-const IFRAME_DURATION = 0.4
+const IFRAME_DURATION = 1.5
 var iframe_timer = 0.0
 
 # Stun -------------------------------------------
@@ -296,7 +296,7 @@ func _physics_process(delta: float) -> void:
 			stamina += EXHAUSTED_RECOVERY * delta
 			if stamina >= EXHAUSTED_THRESHOLD:
 				is_exhausted = false
-				print("Exhausted state ended — stamina: ", stamina)
+				print("Exhausted state ended ΓÇö stamina: ", stamina)
 	elif is_sprinting:
 		stamina -= active_class.get_sprint_stamina_drain() * delta
 		if stamina <= 0:
@@ -605,16 +605,16 @@ func _apply_combat_tool(item: Resource, tier: int):
 	match item.item_name:
 		"Bomb":
 			var dmgs = [15, 30, 50]
-			var rads = [3.0, 4.0, 5.0]
+			var _rads = [3.0, 4.0, 5.0]
 			var dmg = dmgs[tier] if tier < dmgs.size() else 30
-			var rad = rads[tier] if tier < rads.size() else 4.0
+			var rad = _rads[tier] if tier < _rads.size() else 4.0
 			for enemy in get_tree().get_nodes_in_group("enemies"):
 				if global_position.distance_to(enemy.global_position) <= rad:
 					enemy.take_damage(dmg)
 			print("Bomb: ", dmg, " AOE damage in ", rad, "m")
 		"Smoke Bomb":
 			var durs = [3.0, 5.0, 8.0]
-			var rads = [3.0, 4.0, 5.0]
+			var _rads = [3.0, 4.0, 5.0]
 			is_invisible = true
 			invis_timer = durs[tier] if tier < durs.size() else 5.0
 			print("Smoke Bomb: invisible for ", invis_timer, "s")

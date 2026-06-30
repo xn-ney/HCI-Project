@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dh8wvp7homsw6"]
 
-[ext_resource type="Script" uid="uid://ckgskcqdxgli6" path="res://Assets/Scripts/projectile.gd" id="1_yr2qt"]
+[ext_resource type="Script" path="res://Assets/Scripts/projectile_player.gd" id="1_yr2qt"]
 [ext_resource type="PackedScene" uid="uid://ccbmikics3pv5" path="res://Assets/Objects/IronDagger.glb" id="2_tl4hk"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yr2qt"]
@@ -16,7 +16,7 @@ size = Vector3(0.19942379, 0.2775879, 0.33538818)
 [sub_resource type="SphereShape3D" id="SphereShape3D_s1"]
 radius = 0.2
 
-[node name="Projectile" type="RigidBody3D" unique_id=129464057]
+[node name="Projectile" type="RigidBody3D" unique_id=129464057 groups=["projectiles"]]
 continuous_cd = true
 contact_monitor = true
 max_contacts_reported = 1

@@ -24,6 +24,7 @@ var saved_inventory: Array = []
 # Condition registry -------------------------------
 var condition_scripts: Dictionary = {
 	1: AmbushCondition,
+	2: CleanseCondition,
 }
 
 # Auto-start on game launch ------------------------
@@ -86,8 +87,7 @@ func advance_from_campfire():
 
 # Condition selection ------------------------------
 func _roll_condition():
-	var types = condition_scripts.keys()
-	current_condition_type = types[randi() % types.size()]
+	current_condition_type = 2  # Force Cleanse for testing
 
 func get_condition_script() -> Script:
 	return condition_scripts.get(current_condition_type, AmbushCondition)

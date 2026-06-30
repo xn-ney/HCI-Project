@@ -23,7 +23,9 @@ var influence = 0.0
 const MAX_INFLUENCE = 100.0
 const INFLUENCE_PASSIVE_DELAY = 3.0
 const INFLUENCE_DECAY_RATE = 15.0
+const COMBAT_TIMEOUT = 3.0
 var passive_timer = 0.0
+var combat_timer = 0.0
 
 # Berserk & Consumed --------------------------------
 const INFLUENCE_DAMAGE_FLAT = 10.0
@@ -80,10 +82,12 @@ const INNER_STRENGTH_DAMAGE = 40.0
 const INNER_STRENGTH_CHARGE_TIME = 3.5
 const INNER_STRENGTH_COOLDOWN = 60.0
 const INNER_STRENGTH_RADIUS = 8.0
-const INNER_STRENGTH_KNOCKUP = 20.0
+const INNER_STRENGTH_KNOCKUP = 21.5
 var is_charging_inner_strength = false
 var inner_strength_timer = 0.0
 var inner_strength_cooldown = 0.0
+var _airborne_enemies: Dictionary = {}
+var _airborne_just_triggered = false
 
 # Shift: Rampage ------------------------------------
 const RAMPAGE_DAMAGE = 15.0
@@ -134,6 +138,10 @@ func process_class(delta: float) -> void:
 	if lifesteal_timer > 0:
 		lifesteal_timer -= delta
 
+	# Combat timer ------------------------------------
+	if combat_timer > 0:
+		combat_timer = max(combat_timer - delta, 0.0)
+
 	# Inner Strength charging ------------------------
 	if is_charging_inner_strength:
 		player.velocity = Vector3.ZERO
@@ -141,19 +149,41 @@ func process_class(delta: float) -> void:
 		if inner_strength_timer <= 0:
 			is_charging_inner_strength = false
 			inner_strength_cooldown = INNER_STRENGTH_COOLDOWN
+			combat_timer = COMBAT_TIMEOUT
+			_reset_passive_timer()
+			_airborne_enemies.clear()
+			_airborne_just_triggered = true
 			for body in player.get_tree().get_nodes_in_group("enemies"):
 				if not is_instance_valid(body):
 					continue
 				if body.is_on_floor() and player.global_position.distance_to(body.global_position) <= INNER_STRENGTH_RADIUS:
 					body.take_damage(_get_damage(INNER_STRENGTH_DAMAGE))
-					body.set("impulse", Vector3.UP * INNER_STRENGTH_KNOCKUP)
+					var orig_speed = body.get("speed_multiplier")
+					if orig_speed == null or orig_speed <= 0:
+						orig_speed = 1.0
+					_airborne_enemies[body] = orig_speed
+					body.knocked_airborne(999.0, INNER_STRENGTH_KNOCKUP)
 			print("Vessel: Inner Strength unleashed")
 
-	# Passive decay (paused during forced decay) -----
-	if not is_consumed_decaying and not is_charging_inner_strength:
+	# Passive decay (paused during combat, forced decay, or charging) -----
+	if combat_timer <= 0 and not is_consumed_decaying and not is_charging_inner_strength:
 		passive_timer += delta
 		if passive_timer >= INFLUENCE_PASSIVE_DELAY:
 			influence = max(influence - INFLUENCE_DECAY_RATE * delta, 0.0)
+
+	# Airborne landing check -------------------------
+	if _airborne_just_triggered:
+		_airborne_just_triggered = false
+	elif _airborne_enemies.size() > 0:
+		var landed: Array[Node] = []
+		for body in _airborne_enemies:
+			if not is_instance_valid(body):
+				landed.append(body)
+			elif body.is_on_floor():
+				body.restore_from_airborne(_airborne_enemies[body])
+				landed.append(body)
+		for body in landed:
+			_airborne_enemies.erase(body)
 
 	# Consumed state machine -------------------------
 	is_berserk = influence >= BERSERK_THRESHOLD and influence < MAX_INFLUENCE
@@ -184,6 +214,8 @@ func process_class(delta: float) -> void:
 
 	# Rampage contact damage during dash -------------
 	if player.is_dashing:
+		combat_timer = COMBAT_TIMEOUT
+		_reset_passive_timer()
 		for body in player.get_tree().get_nodes_in_group("enemies"):
 			if body in rampage_hit:
 				continue
@@ -193,6 +225,7 @@ func process_class(delta: float) -> void:
 				push_dir.y = 0.0
 				body.set("impulse", Vector3.UP * 8.0)
 				body.set("knockback_velocity", push_dir * RAMPAGE_PUSH)
+				body.set("stunned_timer", 0.8)
 				rampage_hit.append(body)
 	else:
 		rampage_hit.clear()
@@ -242,6 +275,8 @@ func melee_attack() -> void:
 			var heal = (player.max_hp - player.hp) * ROAR_LIFESTEAL_PCT
 			player.hp = min(player.hp + heal, player.max_hp)
 			influence = max(influence - heal * 0.6, 0.0)
+	combat_timer = COMBAT_TIMEOUT
+	_reset_passive_timer()
 
 
 # RMB: Outburst -------------------------------------
@@ -270,10 +305,13 @@ func ranged_attack() -> void:
 		var push_dir = (body.global_position - player.global_position).normalized()
 		push_dir.y = 0.0
 		body.set("knockback_velocity", push_dir * OUTBURST_PUSH)
+		body.set("stunned_timer", 0.8)
 		if lifesteal_timer > 0:
 			var heal = (player.max_hp - player.hp) * ROAR_LIFESTEAL_PCT
 			player.hp = min(player.hp + heal, player.max_hp)
 			influence = max(influence - heal * 0.6, 0.0)
+	combat_timer = COMBAT_TIMEOUT
+	_reset_passive_timer()
 
 
 # Q: Roar -------------------------------------------
@@ -293,6 +331,8 @@ func skill() -> void:
 				slowed.append(body)
 				stored_speeds[body] = s
 	lifesteal_timer = ROAR_LIFESTEAL_DURATION
+	combat_timer = COMBAT_TIMEOUT
+	_reset_passive_timer()
 	await get_tree().create_timer(ROAR_SLOW_DURATION).timeout
 	for body in slowed:
 		if is_instance_valid(body):
@@ -356,6 +396,7 @@ func get_damage_taken_mult() -> float:
 func on_take_damage(amount: float) -> void:
 	if amount <= 0 or not _can_gain_influence():
 		return
+	combat_timer = COMBAT_TIMEOUT
 	_apply_influence(amount, player.hp + amount)
 	influence = min(influence + INFLUENCE_DAMAGE_FLAT, MAX_INFLUENCE)
 

@@ -42,7 +42,7 @@ const PUNISHMENT_DAMAGE = 35.0
 const PUNISHMENT_SPEED = 30.0
 const PUNISHMENT_FIRE_RATE = 0.6
 var punishment_cooldown = 0.0
-const PROJECTILE_SCENE = preload("res://Scenes/projectile.tscn")
+const PROJECTILE_SCENE = preload("res://Scenes/projectile_player.tscn")
 const MAGIC_CIRCLE_TEXTURE = preload("res://Assets/Objects/magic circle prototype.png")
 
 # Q: Denouncement ---------------------------------
@@ -139,9 +139,7 @@ func melee_attack() -> void:
 		push_dir.y = 0.0
 		body.set("impulse", Vector3.UP * BANISHMENT_KNOCKUP)
 		body.set("knockback_velocity", push_dir * BANISHMENT_PUSH)
-		if player.buff_lifesteal_pct > 0:
-			var heal = final_dmg * player.buff_lifesteal_pct
-			player.hp = min(player.hp + heal, player.max_hp)
+		body.set("stunned_timer", 1.2)
 		if not body.is_in_group("branded") and not first_unbranded:
 			first_unbranded = body
 		if not first_branded:
@@ -252,6 +250,8 @@ func ult() -> void:
 			if stored != null:
 				stored_speeds[body] = stored
 				body.set("speed_multiplier", 0.0)
+				body.set("stunned_timer", 2.0)
+				body.set("disengage_timer", JUDGEMENT_STUN_DURATION)
 				affected.append(body)
 	await get_tree().create_timer(JUDGEMENT_STUN_DURATION).timeout
 	for body in affected:

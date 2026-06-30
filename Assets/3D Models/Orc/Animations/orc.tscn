@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://cp588maigp4mi"]
+
+[ext_resource type="Script" uid="uid://cgih8i2v14jm7" path="res://Assets/Scripts/Enemies/orc.gd" id="1_f18he"]
+[ext_resource type="PackedScene" uid="uid://duksa08i63i0q" path="res://Assets/3D Models/Orc/Orc.fbx" id="2_atnsl"]
+[ext_resource type="PackedScene" uid="uid://dpen8y52h4nrv" path="res://Assets/3D Models/Orc/Iron_Cleaver.fbx" id="3_1o42f"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
+height = 2.107
+
+[node name="Orc" type="CharacterBody3D" unique_id=831934320 groups=["enemies"]]
+collision_layer = 8
+script = ExtResource("1_f18he")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=254163438]
+shape = SubResource("CapsuleShape3D_0oxh4")
+
+[node name="ProjectileSpawn" type="Node3D" parent="." unique_id=1388259209]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.65345, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=587323435]
+
+[node name="NameLabel" type="Label3D" parent="." unique_id=104041779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.356, 0)
+billboard = 1
+text = "Orc"
+outline_size = 4
+
+[node name="HPLabel" type="Label3D" parent="." unique_id=352974883]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.486, 0)
+billboard = 1
+text = "200"
+font_size = 48
+outline_size = 4
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=695823471]
+root_node = NodePath("../OrcModel/metarig/Skeleton3D")
+
+[node name="OrcModel" parent="." unique_id=2052145634 instance=ExtResource("2_atnsl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.008128345, -1.0695117, -0.0067745447)
+
+[node name="metarig" parent="OrcModel" index="0" unique_id=393135574]
+transform = Transform3D(1, 0, 0, 0, -1.1920929e-07, 0.99999994, 0, -0.99999994, -1.1920929e-07, 6.532093e-08, 0.014834404, 0.04002676)
+
+[node name="Skeleton3D" parent="OrcModel/metarig" index="0" unique_id=1592473883]
+bones/7/rotation = Quaternion(-0.5485204, -0.4300023, -0.44049105, 0.56585425)
+bones/8/rotation = Quaternion(0.0882911, 0.7279054, -0.08417806, 0.6747389)
+bones/9/rotation = Quaternion(-1.1686163e-09, -0.07194034, 1.0360964e-08, 0.9974089)
+bones/11/rotation = Quaternion(-0.5485204, 0.43000218, 0.44049117, 0.56585425)
+bones/12/rotation = Quaternion(0.08829117, -0.7279054, 0.08417799, 0.6747389)
+bones/13/rotation = Quaternion(-1.1686163e-09, 0.07194034, -1.0360964e-08, 0.9974089)
+bones/17/rotation = Quaternion(0.9815495, 0.009832897, -0.0070955735, 0.19082361)
+bones/18/rotation = Quaternion(0.18917638, 0.014410057, 0.02646367, 0.9814808)
+bones/19/rotation = Quaternion(-0.70464724, 0.0031843642, -0.017885424, 0.7093252)
+bones/20/rotation = Quaternion(-3.8083294e-07, 0.9918431, -0.12746488, -2.675561e-07)
+bones/21/rotation = Quaternion(-0.70133734, -0.7013406, 0.090132184, -0.09013023)
+bones/22/rotation = Quaternion(0.98154926, -0.009829491, 0.0071142856, 0.19082431)
+bones/23/rotation = Quaternion(0.18917969, -0.014411572, -0.026457122, 0.9814803)
+bones/24/rotation = Quaternion(-0.70464855, -0.0031986907, 0.017874615, 0.7093241)
+bones/25/rotation = Quaternion(-1.1047186e-07, 0.9918432, -0.12746443, -6.6287004e-07)
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="OrcModel/metarig/Skeleton3D" index="15" unique_id=694321356]
+transform = Transform3D(0.0140375625, -0.9988353, 0.046152193, 0.037323464, -0.04560119, -0.9982619, 0.99920464, 0.015735736, 0.036639847, -1.1450642, 0.059379976, 1.5859962)
+bone_name = "hand.R"
+bone_idx = 14
+
+[node name="Iron_Cleaver" parent="OrcModel/metarig/Skeleton3D/BoneAttachment3D" unique_id=32361467 instance=ExtResource("3_1o42f")]
+transform = Transform3D(-0.036879256, 0.99931103, 0.0041705146, 0.09938596, -0.0004849136, 0.99504924, 0.99436575, 0.037111074, -0.09929957, -0.0108499825, 0.110870436, 0.012410761)
+
+[editable path="OrcModel"]

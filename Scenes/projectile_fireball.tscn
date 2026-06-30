@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dx5ar6xfw2k8v"]
+
+[ext_resource type="Script" path="res://Assets/Scripts/projectile_enemy.gd" id="1_mh7wo"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yr2qt"]
+albedo_color = Color(1, 0.60784316, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_t1"]
+radius = 0.2
+height = 0.4
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_s1"]
+radius = 0.2
+
+[node name="Projectile" type="RigidBody3D" unique_id=129464058 groups=["projectiles"]]
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_mh7wo")
+
+[node name="SphereVisual" type="MeshInstance3D" parent="." unique_id=362880124]
+material_override = SubResource("StandardMaterial3D_yr2qt")
+mesh = SubResource("SphereMesh_t1")
+
+[node name="SphereCollision" type="CollisionShape3D" parent="." unique_id=411223345]
+shape = SubResource("SphereShape3D_s1")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

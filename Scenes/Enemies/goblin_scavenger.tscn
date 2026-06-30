@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://dc1md344jcp5q"]
+
+[ext_resource type="Script" uid="uid://dh3p6quckkfe4" path="res://Assets/Scripts/Enemies/goblin_scavenger.gd" id="1_hghv2"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
+height = 1.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ne65n"]
+albedo_color = Color(0.4, 0.5, 0.15, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
+
+[node name="Enemy" type="CharacterBody3D" unique_id=1422240559 groups=["enemies", "scavenger"]]
+collision_layer = 8
+script = ExtResource("1_hghv2")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=612689257]
+shape = SubResource("CapsuleShape3D_0oxh4")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1220974954]
+transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_ne65n")
+mesh = SubResource("CapsuleMesh_q26ig")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1971144181]
+
+[node name="NameLabel" type="Label3D" parent="." unique_id=573385373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.025, 0)
+billboard = 1
+text = "Goblin Scavenger"
+outline_size = 4
+
+[node name="HPLabel" type="Label3D" parent="." unique_id=180161654]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+billboard = 1
+text = "40"
+font_size = 48
+outline_size = 4

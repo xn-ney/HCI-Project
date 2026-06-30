@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://bip47tfjbfy5d"]
+
+[ext_resource type="Script" uid="uid://csqsm8ap3g7k5" path="res://Assets/Scripts/NPC/injured_knight.gd" id="1_f1u3a"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0msqk"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_f1u3a"]
+
+[node name="Injured Knight" type="CharacterBody3D" unique_id=1694390046]
+script = ExtResource("1_f1u3a")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1627496157]
+shape = SubResource("CapsuleShape3D_0msqk")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=769727095]
+mesh = SubResource("CapsuleMesh_f1u3a")

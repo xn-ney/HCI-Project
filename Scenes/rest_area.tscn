@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://fvv8efbbbd0"]
+[gd_scene format=3 uid="uid://byf4bwnnqsjcp"]
 
 [ext_resource type="Texture2D" uid="uid://cp1wfulrmcaqm" path="res://Assets/Textures/Brick_Texture.png" id="1_8j60k"]
 [ext_resource type="PackedScene" uid="uid://ctu0ijhkofc6e" path="res://Scenes/player.tscn" id="1_a02cp"]
-[ext_resource type="PackedScene" uid="uid://cm2hv0fi8bxkd" path="res://Scenes/campfire.tscn" id="3_o20gp"]
+[ext_resource type="PackedScene" path="res://Scenes/campfire.tscn" id="3_o20gp"]
 [ext_resource type="Script" uid="uid://4kaj50o4b385" path="res://Assets/Scripts/Shop/Shopkeeper.gd" id="4_fg42k"]
 [ext_resource type="Resource" path="res://Resources/Items/healing_potion.tres" id="8"]
 [ext_resource type="Resource" path="res://Resources/Items/shield_potion.tres" id="9"]
@@ -44,19 +44,14 @@ uv1_scale = Vector3(2, 2, 2)
 size = Vector2(20, 20)
 orientation = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_fo5ed"]
-size = Vector3(1, 1, 0.097839355)
-
-[sub_resource type="QuadMesh" id="QuadMesh_8j60k"]
-
 [sub_resource type="BoxShape3D" id="BoxShape3D_fb"]
 size = Vector3(20, 20, 0.097839355)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_lr"]
-size = Vector3(40, 20, 0.097839355)
-
 [sub_resource type="QuadMesh" id="QuadMesh_fb"]
 size = Vector2(20, 20)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lr"]
+size = Vector3(40, 20, 0.097839355)
 
 [sub_resource type="QuadMesh" id="QuadMesh_lr"]
 size = Vector2(40, 20)
@@ -136,7 +131,7 @@ height = 0.2
 environment = SubResource("Environment_night")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=546032214]
-transform = Transform3D(-0.707107, 0, -0.707107, -0.497469, -0.710690, 0.497469, -0.502519, 0.703527, 0.502519, 0, 25, 0)
+transform = Transform3D(-0.707107, 0, -0.707107, -0.497469, -0.71069, 0.497469, -0.502519, 0.703527, 0.502519, 0, 25, 0)
 light_color = Color(0.2, 0.2, 0.3, 1)
 light_energy = 0.3
 
@@ -168,7 +163,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
 shape = SubResource("BoxShape3D_fb")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsFront" unique_id=571800589]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.280)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
 mesh = SubResource("QuadMesh_fb")
 
 [node name="WallsBack" type="StaticBody3D" parent="Walls" unique_id=1554164348]
@@ -179,7 +174,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
 shape = SubResource("BoxShape3D_fb")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsBack" unique_id=1673063605]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.280)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
 mesh = SubResource("QuadMesh_fb")
 
 [node name="WallsLeft" type="StaticBody3D" parent="Walls" unique_id=1076397987]
@@ -190,7 +185,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
 shape = SubResource("BoxShape3D_lr")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsLeft" unique_id=1857382241]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.280)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
 mesh = SubResource("QuadMesh_lr")
 
 [node name="WallsRight" type="StaticBody3D" parent="Walls" unique_id=411412941]
@@ -201,7 +196,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
 shape = SubResource("BoxShape3D_lr")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Walls/WallsRight" unique_id=1119113957]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.280)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
 mesh = SubResource("QuadMesh_lr")
 
 [node name="Campfire" parent="." unique_id=186075708 instance=ExtResource("3_o20gp")]

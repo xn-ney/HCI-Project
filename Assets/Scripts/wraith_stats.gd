@@ -32,7 +32,7 @@ var is_focused = false
 var focused_timer = 0.0
 
 # LMB: Claw ---------------------------------------
-const CLAW_DAMAGE = 25.0
+const CLAW_DAMAGE = 18.0
 const CLAW_RANGE = 3.5
 const CLAW_ANGLE = 120.0
 
@@ -40,12 +40,12 @@ const CLAW_ANGLE = 120.0
 const KNIFE_DAMAGE = 12.0
 const KNIFE_RATE = 0.5
 var knife_timer = 0.0
-const PROJECTILE_SCENE = preload("res://Scenes/projectile.tscn")
+const PROJECTILE_SCENE = preload("res://Scenes/projectile_player.tscn")
 
 # Q: Ravage ---------------------------------------
 const RAVAGE_DAMAGE = 40.0
-const RAVAGE_SPEED = 40.0
-const RAVAGE_DURATION = 0.1
+const RAVAGE_SPEED = 60.0
+const RAVAGE_DURATION = 0.06
 const RAVAGE_COOLDOWN = 4.5
 const RAVAGE_STAMINA_COST = 0.0
 var ravage_cooldown = 0.0
@@ -56,10 +56,10 @@ var ravage_hit: Array[Node] = []
 
 # E: Assassinate ----------------------------------
 const ASSASSINATE_COOLDOWN = 10.0
-const ASSASSINATE_FOCUSED_COOLDOWN = 5.0
-const ASSASSINATE_RANGE = 8.0
-const ASSASSINATE_DASH_SPEED = 25.0
-const ASSASSINATE_EXECUTE_PCT = 0.3
+const ASSASSINATE_FOCUSED_COOLDOWN = 6.0
+const ASSASSINATE_RANGE = 9.0
+const ASSASSINATE_DASH_SPEED = 35.0
+const ASSASSINATE_EXECUTE_PCT = 0.4
 const ASSASSINATE_NORMAL_DMG = 10.0
 const ASSASSINATE_BOSS_DMG = 50.0
 const ASSASSINATE_AOE_RADIUS = 3.0
@@ -127,6 +127,8 @@ func process_class(delta: float) -> void:
 		player.velocity = dir * ASSASSINATE_DASH_SPEED
 		var hit: Node3D = null
 		for body in player.get_tree().get_nodes_in_group("enemies"):
+			if body.hp <= 0:
+				continue
 			if player.global_position.distance_to(body.global_position) <= 2.0:
 				hit = body
 				break
@@ -134,6 +136,8 @@ func process_class(delta: float) -> void:
 			is_assassinating = false
 			if hit:
 				for body in player.get_tree().get_nodes_in_group("enemies"):
+					if body.hp <= 0:
+						continue
 					if player.global_position.distance_to(body.global_position) <= ASSASSINATE_AOE_RADIUS:
 						_execute_damage(body)
 			assassinate_target = null
@@ -226,6 +230,8 @@ func ult() -> void:
 	var best_body = null
 	var best_distance = ASSASSINATE_RANGE
 	for body in player.get_tree().get_nodes_in_group("enemies"):
+		if body.hp <= 0:
+			continue
 		var to_enemy = body.global_position - player.global_position
 		var distance = to_enemy.length()
 		if distance > ASSASSINATE_RANGE:
