@@ -30,6 +30,7 @@ size = Vector3(1, 1, 0.097839355)
 transform = Transform3D(0.81403166, 0.5310083, -0.23533542, 0.19368804, 0.13380814, 0.9718952, 0.5475742, -0.8367351, 0.006074103, 0, 21.492619, 0)
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=66906496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.011749744, -0.044861674, 0.02150774)
 navigation_mesh = SubResource("NavigationMesh_fo5ed")
 
 [node name="Floor" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1275906443]

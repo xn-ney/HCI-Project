@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/rare.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Band of Power"
+rarity = ExtResource("2")
+description = "Crackles with latent energy."
+price = 32
+equipment_type = "accessory"
+class_restriction = ""
+hp_bonus = 12
+stamina_bonus = 8
+defense = 3
+class_unique_effect = "+8% Damage, +8% Ult Charge Rate"
+dmg_bonus_pct=8
+ult_charge_rate_pct=8

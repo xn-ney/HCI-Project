@@ -12,6 +12,10 @@ func _ready():
 	rest_btn.pressed.connect(_on_rest)
 	exit_btn.pressed.connect(_on_exit)
 
+func _input(event):
+	if event.is_action_pressed("ui_cancel"):
+		close()
+
 func setup(fire: Node):
 	campfire = fire
 

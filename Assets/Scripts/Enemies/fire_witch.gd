@@ -97,6 +97,8 @@ func _ready():
 
 
 func _physics_process(delta: float) -> void:
+	if player and player.is_invisible:
+		return
 	if player == null:
 		return
 

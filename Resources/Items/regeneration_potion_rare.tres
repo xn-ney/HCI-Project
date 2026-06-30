@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/ShopItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/rare.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Regeneration Potion"
+rarity = ExtResource("2")
+description = "Restores 5 HP per second for 10s"
+price = 35
+item_type = "potion"
+class_restriction = ""

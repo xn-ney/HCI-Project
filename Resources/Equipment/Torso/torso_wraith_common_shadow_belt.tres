@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/common.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Shadow Belt"
+rarity = ExtResource("2")
+description = "Barely visible, like a wisp."
+price = 25
+equipment_type = "torso"
+class_restriction = "Wraith"
+hp_bonus = 5
+stamina_bonus = 18
+defense = 1
+class_unique_effect = "+5% Focus Gain"
+focus_gain_pct=5

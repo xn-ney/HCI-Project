@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/epic.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Eternal Vow"
+rarity = ExtResource("2")
+description = "An unbreakable promise carved in stone."
+price = 65
+equipment_type = "accessory"
+class_restriction = ""
+hp_bonus = 20
+stamina_bonus = 15
+defense = 4
+class_unique_effect = "+12% Ult Charge, +10% Mana Regen, +5% Skill Cooldown Reduction"
+ult_charge_rate_pct=12
+mana_regen_pct=10
+skill_cooldown_reduction_pct=5

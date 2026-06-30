@@ -22,10 +22,7 @@ func _input(event):
 		open_ui()
 
 func _is_any_ui_open() -> bool:
-	for c in get_tree().current_scene.get_children():
-		if c is CanvasLayer:
-			return true
-	return false
+	return GameManager.ui_open
 
 func open_ui():
 	_stop_player_actions()

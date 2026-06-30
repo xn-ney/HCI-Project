@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/epic.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Seraphim Chestguard"
+rarity = ExtResource("2")
+description = "Divine armor empowering your judgement."
+price = 95
+equipment_type = "chest"
+class_restriction = "Sentinel"
+hp_bonus = 65
+stamina_bonus = 40
+defense = 10
+class_unique_effect = "+15% Mana Regen, Branded enemies take 10% more dmg"
+mana_regen_pct=15
+branded_dmg_bonus_pct=10

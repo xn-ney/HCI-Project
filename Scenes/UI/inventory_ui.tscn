@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://b7v3i0cf4vao2"]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Shop/InventoryUI.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.1, 0.1, 0.1, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+bg_color = Color(0.15, 0.15, 0.15, 1)
+border_color = Color(0.3, 0.3, 0.3, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[node name="InventoryUI" type="Panel"]
+anchors_preset = 0
+anchor_left = 0.25
+anchor_top = 0.15
+anchor_right = 0.75
+anchor_bottom = 0.9
+theme_override_styles/panel = SubResource("StyleBoxFlat_1")
+script = ExtResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="BagHeader" type="Label" parent="MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "Bag:"
+
+[node name="BagGrid" type="GridContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_horizontal = 3
+columns = 4
+custom_minimum_size = Vector2(0, 120)
+
+[node name="EquipmentHeader" type="Label" parent="MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "Equipment:"
+
+[node name="EquipmentRow" type="VBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(0, 80)
+
+[node name="ChestLabel" type="Label" parent="MarginContainer/VBox/EquipmentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Chest: Empty"
+mouse_filter = 0
+
+[node name="TorsoLabel" type="Label" parent="MarginContainer/VBox/EquipmentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Torso: Empty"
+mouse_filter = 0
+
+[node name="AccessoryLabel" type="Label" parent="MarginContainer/VBox/EquipmentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "Acc: Empty"
+mouse_filter = 0
+
+[node name="HotkeyHeader" type="Label" parent="MarginContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "Hotkeys:"
+
+[node name="HotkeyContainer" type="HBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 0
+custom_minimum_size = Vector2(0, 36)
+
+[node name="CloseButton" type="Button" parent="."]
+anchors_preset = 0
+anchor_left = 0.9
+anchor_top = 0.01
+anchor_right = 0.98
+anchor_bottom = 0.06
+text = "Close"

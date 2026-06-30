@@ -4,16 +4,96 @@
 [ext_resource type="PackedScene" uid="uid://ctu0ijhkofc6e" path="res://Scenes/player.tscn" id="1_a02cp"]
 [ext_resource type="PackedScene" path="res://Scenes/campfire.tscn" id="3_o20gp"]
 [ext_resource type="Script" uid="uid://4kaj50o4b385" path="res://Assets/Scripts/Shop/Shopkeeper.gd" id="4_fg42k"]
-[ext_resource type="Resource" path="res://Resources/Items/healing_potion.tres" id="8"]
-[ext_resource type="Resource" path="res://Resources/Items/shield_potion.tres" id="9"]
-[ext_resource type="Resource" path="res://Resources/Items/stamina_potion.tres" id="10"]
-[ext_resource type="Resource" path="res://Resources/Items/regeneration_potion.tres" id="11"]
-[ext_resource type="Resource" path="res://Resources/Items/mana_potion.tres" id="12"]
-[ext_resource type="Resource" path="res://Resources/Items/calming_potion.tres" id="13"]
-[ext_resource type="Resource" path="res://Resources/Items/invisibility_potion.tres" id="14"]
-[ext_resource type="Resource" path="res://Resources/Items/bomb.tres" id="15"]
-[ext_resource type="Resource" path="res://Resources/Items/smoke_bomb.tres" id="16"]
-[ext_resource type="Resource" path="res://Resources/Items/bear_trap.tres" id="17"]
+[ext_resource type="Resource" path="res://Resources/Items/healing_potion_common.tres" id="8"]
+[ext_resource type="Resource" path="res://Resources/Items/healing_potion_rare.tres" id="78"]
+[ext_resource type="Resource" path="res://Resources/Items/healing_potion_epic.tres" id="79"]
+[ext_resource type="Resource" path="res://Resources/Items/shield_potion_common.tres" id="80"]
+[ext_resource type="Resource" path="res://Resources/Items/shield_potion_rare.tres" id="9"]
+[ext_resource type="Resource" path="res://Resources/Items/shield_potion_epic.tres" id="81"]
+[ext_resource type="Resource" path="res://Resources/Items/stamina_potion_common.tres" id="10"]
+[ext_resource type="Resource" path="res://Resources/Items/stamina_potion_rare.tres" id="82"]
+[ext_resource type="Resource" path="res://Resources/Items/stamina_potion_epic.tres" id="83"]
+[ext_resource type="Resource" path="res://Resources/Items/regeneration_potion_common.tres" id="84"]
+[ext_resource type="Resource" path="res://Resources/Items/regeneration_potion_rare.tres" id="85"]
+[ext_resource type="Resource" path="res://Resources/Items/regeneration_potion_epic.tres" id="11"]
+[ext_resource type="Resource" path="res://Resources/Items/mana_potion_common.tres" id="90"]
+[ext_resource type="Resource" path="res://Resources/Items/mana_potion_rare.tres" id="12"]
+[ext_resource type="Resource" path="res://Resources/Items/mana_potion_epic.tres" id="91"]
+[ext_resource type="Resource" path="res://Resources/Items/calming_potion_common.tres" id="13"]
+[ext_resource type="Resource" path="res://Resources/Items/calming_potion_rare.tres" id="86"]
+[ext_resource type="Resource" path="res://Resources/Items/calming_potion_epic.tres" id="87"]
+[ext_resource type="Resource" path="res://Resources/Items/invisibility_potion_common.tres" id="88"]
+[ext_resource type="Resource" path="res://Resources/Items/invisibility_potion_rare.tres" id="89"]
+[ext_resource type="Resource" path="res://Resources/Items/invisibility_potion_epic.tres" id="14"]
+[ext_resource type="Resource" path="res://Resources/Items/bomb_common.tres" id="94"]
+[ext_resource type="Resource" path="res://Resources/Items/bomb_rare.tres" id="15"]
+[ext_resource type="Resource" path="res://Resources/Items/bomb_epic.tres" id="95"]
+[ext_resource type="Resource" path="res://Resources/Items/throwing_knife_common.tres" id="16"]
+[ext_resource type="Resource" path="res://Resources/Items/throwing_knife_rare.tres" id="96"]
+[ext_resource type="Resource" path="res://Resources/Items/throwing_knife_epic.tres" id="97"]
+[ext_resource type="Resource" path="res://Resources/Items/bear_trap_common.tres" id="92"]
+[ext_resource type="Resource" path="res://Resources/Items/bear_trap_rare.tres" id="93"]
+[ext_resource type="Resource" path="res://Resources/Items/bear_trap_epic.tres" id="17"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_bone_chestplate.tres" id="18"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_copper_chestguard.tres" id="19"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_dragon_scale_chest.tres" id="20"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_hardened_leather.tres" id="21"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_hide_tunic.tres" id="22"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_iron_breastplate.tres" id="23"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_leather_vest.tres" id="24"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_phoenix_mail.tres" id="25"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_scale_vest.tres" id="26"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_sentinel_common_warden_plate.tres" id="27"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_sentinel_epic_seraphim_chestguard.tres" id="28"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_sentinel_rare_guardian_mail.tres" id="29"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_silver_chainmail.tres" id="30"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_steel_cuirass.tres" id="31"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_vessel_common_berserker_hide.tres" id="32"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_vessel_epic_abyssal_carapace.tres" id="33"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_vessel_rare_bloodrage_plate.tres" id="34"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_wraith_common_shadow_vest.tres" id="35"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_wraith_epic_soul_reaver_chest.tres" id="36"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Chest/chest_wraith_rare_phantom_doublet.tres" id="37"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_bone_tassets.tres" id="38"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_copper_fauld.tres" id="39"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_dragon_scale_belt.tres" id="40"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_hardened_belt.tres" id="41"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_hide_loincloth.tres" id="42"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_iron_girdle.tres" id="43"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_leather_belt.tres" id="44"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_phoenix_girdle.tres" id="45"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_scale_skirt.tres" id="46"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_sentinel_common_warden_belt.tres" id="47"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_sentinel_epic_seraphim_waistguard.tres" id="48"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_sentinel_rare_guardian_girdle.tres" id="49"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_silver_fauld.tres" id="50"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_steel_tassets.tres" id="51"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_vessel_common_berserker_belt.tres" id="52"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_vessel_epic_abyssal_waistguard.tres" id="53"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_vessel_rare_bloodrage_girdle.tres" id="54"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_wraith_common_shadow_belt.tres" id="55"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_wraith_epic_soul_reaver_belt.tres" id="56"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Torso/torso_wraith_rare_phantom_girdle.tres" id="57"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_wraith_common_whisper_ring.tres" id="58"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_wraith_rare_phantom_amulet.tres" id="59"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_wraith_epic_soulbinders_toll.tres" id="60"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_vessel_common_blood_charm.tres" id="61"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_vessel_rare_fury_seal.tres" id="62"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_vessel_epic_abyssal_heart.tres" id="63"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_sentinel_common_oath_band.tres" id="64"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_sentinel_rare_branding_circlet.tres" id="65"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_sentinel_epic_seraphs_sigil.tres" id="66"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_rusted_luck_ring.tres" id="67"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_travelers_talisman.tres" id="68"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_copper_loop.tres" id="69"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_bone_stud.tres" id="70"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_simple_pendant.tres" id="71"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_menders_signet.tres" id="72"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_hunters_trophy.tres" id="73"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_band_of_power.tres" id="74"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_serpentine_coil.tres" id="75"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_phoenix_teardrop.tres" id="76"]
+[ext_resource type="Resource" path="res://Resources/Equipment/Accessory/accessory_eternal_vow.tres" id="77"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_night"]
 sky_top_color = Color(0.02, 0.02, 0.05, 1)
@@ -68,8 +148,8 @@ radius = 0.3
 height = 1.2
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_zone"]
-radius = 2.0
-height = 4.0
+radius = 4.0
+height = 6.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_counter"]
 size = Vector3(2.5, 0.9, 0.8)
@@ -156,7 +236,7 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.855, -5)
 visible = false
 
 [node name="WallsFront" type="StaticBody3D" parent="Walls" unique_id=463564571]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -9.696, 16, 0.03)
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -9.696, 0.5, 0.03)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsFront" unique_id=10828429]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
@@ -167,7 +247,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
 mesh = SubResource("QuadMesh_fb")
 
 [node name="WallsBack" type="StaticBody3D" parent="Walls" unique_id=1554164348]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 9.648, 16, 0.03)
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 9.648, 0.5, 0.03)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsBack" unique_id=1317815468]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
@@ -178,7 +258,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
 mesh = SubResource("QuadMesh_fb")
 
 [node name="WallsLeft" type="StaticBody3D" parent="Walls" unique_id=1076397987]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.274, 16, -9.639)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.274, 0.5, -9.639)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsLeft" unique_id=1949590413]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
@@ -189,7 +269,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.272, -0.28)
 mesh = SubResource("QuadMesh_lr")
 
 [node name="WallsRight" type="StaticBody3D" parent="Walls" unique_id=411412941]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.274, 16, 9.519)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -0.274, 0.5, 9.519)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Walls/WallsRight" unique_id=2119701136]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.282, -0.293)
@@ -208,7 +288,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 [node name="Shopkeeper" type="CharacterBody3D" parent="Shop" unique_id=1406987602]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0.3)
 script = ExtResource("4_fg42k")
-item_pool = Array[Resource]([ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("17")])
+item_pool = Array[Resource]([ExtResource("8"), ExtResource("78"), ExtResource("79"), ExtResource("80"), ExtResource("9"), ExtResource("81"), ExtResource("10"), ExtResource("82"), ExtResource("83"), ExtResource("84"), ExtResource("85"), ExtResource("11"), ExtResource("90"), ExtResource("12"), ExtResource("91"), ExtResource("13"), ExtResource("86"), ExtResource("87"), ExtResource("88"), ExtResource("89"), ExtResource("14"), ExtResource("94"), ExtResource("15"), ExtResource("95"), ExtResource("16"), ExtResource("96"), ExtResource("97"), ExtResource("92"), ExtResource("93"), ExtResource("17")])
+equipment_pool = Array[Resource]([ExtResource("18"), ExtResource("19"), ExtResource("20"), ExtResource("21"), ExtResource("22"), ExtResource("23"), ExtResource("24"), ExtResource("25"), ExtResource("26"), ExtResource("27"), ExtResource("28"), ExtResource("29"), ExtResource("30"), ExtResource("31"), ExtResource("32"), ExtResource("33"), ExtResource("34"), ExtResource("35"), ExtResource("36"), ExtResource("37"), ExtResource("38"), ExtResource("39"), ExtResource("40"), ExtResource("41"), ExtResource("42"), ExtResource("43"), ExtResource("44"), ExtResource("45"), ExtResource("46"), ExtResource("47"), ExtResource("48"), ExtResource("49"), ExtResource("50"), ExtResource("51"), ExtResource("52"), ExtResource("53"), ExtResource("54"), ExtResource("55"), ExtResource("56"), ExtResource("57"), ExtResource("58"), ExtResource("59"), ExtResource("60"), ExtResource("61"), ExtResource("62"), ExtResource("63"), ExtResource("64"), ExtResource("65"), ExtResource("66"), ExtResource("67"), ExtResource("68"), ExtResource("69"), ExtResource("70"), ExtResource("71"), ExtResource("72"), ExtResource("73"), ExtResource("74"), ExtResource("75"), ExtResource("76"), ExtResource("77")])
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Shop/Shopkeeper" unique_id=812067311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.029844284, 0.19649029, 0)

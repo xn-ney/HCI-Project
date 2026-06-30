@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trap"]
+bottom_radius = 0.5
+top_radius = 0.5
+height = 0.03
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trap"]
+albedo_color = Color(0.8, 0.15, 0.1, 0.7)
+emission_enabled = true
+emission = Color(0.8, 0.1, 0.05, 1)
+emission_energy_multiplier = 2.0
+transparency = 0.3
+
+[node name="BearTrap" type="Node3D"]
+
+[node name="Disc" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.015, 0)
+mesh = SubResource("CylinderMesh_trap")
+material_override = SubResource("StandardMaterial3D_trap")

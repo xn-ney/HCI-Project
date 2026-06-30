@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/epic.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Phoenix Girdle"
+rarity = ExtResource("2")
+description = "Warm to the touch, reborn daily."
+price = 85
+equipment_type = "torso"
+class_restriction = ""
+hp_bonus = 50
+stamina_bonus = 70
+defense = 8
+class_unique_effect = ""

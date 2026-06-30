@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShopItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/ShopItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/common.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Invisibility Potion"
+rarity = ExtResource("2")
+description = "Turn invisible for 3s (Wraith)"
+price = 20
+item_type = "class_potion"
+class_restriction = "Wraith"

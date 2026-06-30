@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/common.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Warden Plate"
+rarity = ExtResource("2")
+description = "Sentinel-issued chestplate with mana weave."
+price = 25
+equipment_type = "chest"
+class_restriction = "Sentinel"
+hp_bonus = 15
+stamina_bonus = 8
+defense = 3
+class_unique_effect = "+5% Mana Regen"
+mana_regen_pct=5

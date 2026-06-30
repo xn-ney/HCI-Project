@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/epic.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Soul Reaver Chest"
+rarity = ExtResource("2")
+description = "Feeds on souls to extend your focus."
+price = 95
+equipment_type = "chest"
+class_restriction = "Wraith"
+hp_bonus = 40
+stamina_bonus = 55
+defense = 6
+class_unique_effect = "+15% Focus Gain, Focused lasts 3s longer"
+focus_gain_pct=15
+focused_duration_extend=3

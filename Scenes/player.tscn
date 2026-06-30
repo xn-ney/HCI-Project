@@ -108,36 +108,6 @@ offset_right = 226.0
 offset_bottom = 149.0
 vertical_alignment = 1
 
-[node name="HPLabel2" type="Label" parent="HUD" unique_id=1043164370]
-offset_top = 25.0
-offset_right = 226.0
-offset_bottom = 49.0
-vertical_alignment = 1
-
-[node name="FocusLabel2" type="Label" parent="HUD" unique_id=1867010394]
-offset_top = 50.0
-offset_right = 226.0
-offset_bottom = 74.0
-vertical_alignment = 1
-
-[node name="SkillCooldown2" type="Label" parent="HUD" unique_id=57475139]
-offset_top = 75.0
-offset_right = 226.0
-offset_bottom = 99.0
-vertical_alignment = 1
-
-[node name="UltCooldown2" type="Label" parent="HUD" unique_id=1201163052]
-offset_top = 100.0
-offset_right = 226.0
-offset_bottom = 124.0
-vertical_alignment = 1
-
-[node name="ClassLabel2" type="Label" parent="HUD" unique_id=273606760]
-offset_top = 125.0
-offset_right = 226.0
-offset_bottom = 149.0
-vertical_alignment = 1
-
 [node name="Crosshair" type="Label" parent="HUD" unique_id=768479307]
 anchors_preset = 8
 anchor_left = 0.5
@@ -160,11 +130,11 @@ vertical_alignment = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -159.0
-offset_bottom = 99.0
+offset_left = -185.0
+offset_bottom = 120.0
 grow_horizontal = 0
 theme_override_font_sizes/font_size = 10
-text = "Controls:
+	text = "Controls:
 Keyboard || Gamepad
 WASD || LJoy - Walk
 Mouse || RJoy - Camera
@@ -173,7 +143,9 @@ Space || A - Jump 2x
 Left Click || LB - Melee
 Right Click || LB - Ranged
 Q || X - Skill
-E || B - Ult"
+E || B - Ult
+1-4 || - Hotkeys
+B || - Inventory"
 horizontal_alignment = 2
 
 [node name="CleanseProgressLabel" type="Label" parent="HUD" unique_id=1830093349]

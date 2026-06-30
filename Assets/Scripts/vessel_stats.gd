@@ -22,20 +22,29 @@ const MELEE_CONSUMED_SPEED = 0.4
 var influence = 0.0
 const MAX_INFLUENCE = 100.0
 const INFLUENCE_PASSIVE_DELAY = 3.0
-const INFLUENCE_DECAY_RATE = 15.0
+const INFLUENCE_DECAY_RATE_BASE = 15.0
+var influence_decay_rate = INFLUENCE_DECAY_RATE_BASE
 const COMBAT_TIMEOUT = 3.0
 var passive_timer = 0.0
 var combat_timer = 0.0
 
 # Berserk & Consumed --------------------------------
 const INFLUENCE_DAMAGE_FLAT = 10.0
-const BERSERK_THRESHOLD = 80.0
+const BERSERK_THRESHOLD_BASE = 80.0
+var berserk_threshold = BERSERK_THRESHOLD_BASE
 const BERSERK_DAMAGE_MULT = 1.5
-const CONSUMED_DAMAGE_TAKEN_MULT = 3.0
+const CONSUMED_DAMAGE_TAKEN_MULT_BASE = 3.0
+var consumed_dmg_taken_mult = CONSUMED_DAMAGE_TAKEN_MULT_BASE
+var equipment_dmg_bonus = 0.0
+var equipment_lifesteal_on_kill = 0.0
+var equipment_influence_gain: float = 0.0
+var equipment_skill_cdr: float = 0.0
 const CONSUMED_COOLDOWN_MULT = 1.5
-const CONSUMED_DURATION = 5.0
+const CONSUMED_DURATION_BASE = 5.0
+var consumed_duration = CONSUMED_DURATION_BASE
 const CONSUMED_DECAY_TARGET = 50.0
-const CONSUMED_DECAY_RATE = 10.0
+const CONSUMED_DECAY_RATE_BASE = 10.0
+var consumed_decay_rate = CONSUMED_DECAY_RATE_BASE
 var is_berserk = false
 var is_consumed = false
 var is_consumed_active = false
@@ -169,7 +178,7 @@ func process_class(delta: float) -> void:
 	if combat_timer <= 0 and not is_consumed_decaying and not is_charging_inner_strength:
 		passive_timer += delta
 		if passive_timer >= INFLUENCE_PASSIVE_DELAY:
-			influence = max(influence - INFLUENCE_DECAY_RATE * delta, 0.0)
+			influence = max(influence - influence_decay_rate * delta, 0.0)
 
 	# Airborne landing check -------------------------
 	if _airborne_just_triggered:
@@ -186,12 +195,12 @@ func process_class(delta: float) -> void:
 			_airborne_enemies.erase(body)
 
 	# Consumed state machine -------------------------
-	is_berserk = influence >= BERSERK_THRESHOLD and influence < MAX_INFLUENCE
+	is_berserk = influence >= berserk_threshold and influence < MAX_INFLUENCE
 
 	if influence >= MAX_INFLUENCE and not is_consumed:
 		is_consumed = true
 		is_consumed_active = true
-		consumed_timer = CONSUMED_DURATION
+		consumed_timer = consumed_duration
 		is_consumed_decaying = false
 		print("Vessel: Consumed — 5s active window")
 
@@ -203,7 +212,7 @@ func process_class(delta: float) -> void:
 			print("Vessel: Consumed decay phase — effects off, draining to ", CONSUMED_DECAY_TARGET)
 
 	if is_consumed_decaying:
-		influence = max(influence - CONSUMED_DECAY_RATE * delta, CONSUMED_DECAY_TARGET)
+		influence = max(influence - consumed_decay_rate * delta, CONSUMED_DECAY_TARGET)
 		if influence <= CONSUMED_DECAY_TARGET:
 			is_consumed = false
 			is_consumed_decaying = false
@@ -239,7 +248,7 @@ func process_class(delta: float) -> void:
 		ult_label.text = "Ult: DISABLED"
 	elif inner_strength_cooldown > 0:
 		ult_label.text = "Ult: " + str(snapped(inner_strength_cooldown, 0.1)) + "s"
-	elif influence >= BERSERK_THRESHOLD:
+	elif influence >= berserk_threshold:
 		ult_label.text = "Ult: Inner Strength"
 	else:
 		ult_label.text = "Ult: Ready" if bloom_cooldown <= 0 else "Ult: " + str(snapped(bloom_cooldown, 0.1)) + "s"
@@ -262,10 +271,14 @@ func melee_attack() -> void:
 		var result = space_state.intersect_ray(ray_query)
 		if result and result.collider != body:
 			continue
+		dmg *= player.buff_damage_mult
 		body.take_damage(dmg)
 		var push_dir = (body.global_position - player.global_position).normalized()
 		push_dir.y = 0.0
 		body.set("knockback_velocity", push_dir * push)
+		if player.buff_lifesteal_pct > 0:
+			var heal = dmg * player.buff_lifesteal_pct
+			player.hp = min(player.hp + heal, player.max_hp)
 		# Lifesteal during Roar buff
 		if lifesteal_timer > 0:
 			var heal = (player.max_hp - player.hp) * ROAR_LIFESTEAL_PCT
@@ -344,7 +357,7 @@ func ult() -> void:
 	if inner_strength_cooldown > 0:
 		return
 	# Inner Strength at 80+ influence
-	if influence >= BERSERK_THRESHOLD and _can_gain_influence():
+	if influence >= berserk_threshold and _can_gain_influence():
 		if not player.is_on_floor():
 			return
 		is_charging_inner_strength = true
@@ -352,7 +365,7 @@ func ult() -> void:
 		print("Vessel: Inner Strength charging — ", INNER_STRENGTH_CHARGE_TIME, "s")
 		return
 	# Bloom below 80 influence
-	if influence >= BERSERK_THRESHOLD or bloom_cooldown > 0 or not _can_gain_influence():
+	if influence >= berserk_threshold or bloom_cooldown > 0 or not _can_gain_influence():
 		return
 	var cost = player.hp * BLOOM_HP_COST
 	if cost <= 0:
@@ -384,8 +397,21 @@ func get_dash_duration() -> float:
 	return RAMPAGE_DURATION
 
 
+# Equipment effects --------------------------------
+func _on_equipment_changed():
+	var eq = player.equipment_effects if player else {}
+	berserk_threshold = max(0.0, BERSERK_THRESHOLD_BASE - eq.get("berserk_threshold_reduction", 0.0))
+	consumed_dmg_taken_mult = CONSUMED_DAMAGE_TAKEN_MULT_BASE * (1.0 - eq.get("consumed_dmg_taken_reduction", 0.0) / 100.0)
+	consumed_duration = CONSUMED_DURATION_BASE + eq.get("consumed_duration_extend", 0.0)
+	equipment_dmg_bonus = eq.get("dmg_bonus_pct", 0.0)
+	equipment_lifesteal_on_kill = eq.get("lifesteal_on_kill_pct", 0.0)
+	equipment_influence_gain = eq.get("influence_gain_pct", 0.0)
+	influence_decay_rate = INFLUENCE_DECAY_RATE_BASE * (1.0 - eq.get("influence_decay_reduction", 0.0) / 100.0)
+	equipment_skill_cdr = eq.get("skill_cooldown_reduction_pct", 0.0)
+
+
 func get_damage_taken_mult() -> float:
-	return CONSUMED_DAMAGE_TAKEN_MULT if is_consumed_active else 1.0
+	return consumed_dmg_taken_mult if is_consumed_active else 1.0
 
 
 # Status effects ------------------------------------
@@ -408,15 +434,18 @@ func _on_enemy_killed() -> void:
 	var gained = lost_hp * 0.02
 	influence = min(influence + gained, MAX_INFLUENCE)
 	_reset_passive_timer()
+	if equipment_lifesteal_on_kill > 0 and player.hp < player.max_hp:
+		player.hp = min(player.hp + equipment_lifesteal_on_kill, player.max_hp)
 
 
 # Internal helpers ----------------------------------
 func _get_damage(base: float) -> float:
-	return base * BERSERK_DAMAGE_MULT if is_berserk else base
+	var dmg = base * BERSERK_DAMAGE_MULT if is_berserk else base
+	return dmg * (1.0 + equipment_dmg_bonus / 100.0)
 
 
 func _get_cooldown(base: float) -> float:
-	return base * CONSUMED_COOLDOWN_MULT if is_consumed_active else base
+	return base * (1.0 - equipment_skill_cdr / 100.0) * (CONSUMED_COOLDOWN_MULT if is_consumed_active else 1.0)
 
 
 func _apply_hp_cost(percent: float) -> bool:
@@ -437,7 +466,7 @@ func _apply_influence(damage: float, hp_before_cost: float) -> void:
 	if not _can_gain_influence():
 		return
 	var lost_hp = player.max_hp - hp_before_cost
-	var gained = damage * 0.1 + lost_hp * 0.05
+	var gained = (damage * 0.1 + lost_hp * 0.05) * (1.0 + equipment_influence_gain / 100.0)
 	influence = min(influence + gained, MAX_INFLUENCE)
 	_reset_passive_timer()
 

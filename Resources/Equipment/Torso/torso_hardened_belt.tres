@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/rare.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Hardened Belt"
+rarity = ExtResource("2")
+description = "Multi-layer hardened leather belt."
+price = 38
+equipment_type = "torso"
+class_restriction = ""
+hp_bonus = 18
+stamina_bonus = 32
+defense = 4
+class_unique_effect = ""

@@ -2,15 +2,15 @@ class_name RarityRates
 extends Resource
 
 @export var rest_area_visit: int = 1
-@export var small_rate: float = 0.75
-@export var medium_rate: float = 0.20
-@export var large_rate: float = 0.05
+@export var common_rate: float = 0.80
+@export var rare_rate: float = 0.15
+@export var epic_rate: float = 0.05
 
 func roll_rarity() -> ItemRarity:
 	var roll = randf()
-	if roll < large_rate:
-		return load("res://Resources/SizeTiers/large.tres")
-	elif roll < large_rate + medium_rate:
-		return load("res://Resources/SizeTiers/medium.tres")
+	if roll < epic_rate:
+		return load("res://Resources/SizeTiers/epic.tres")
+	elif roll < epic_rate + rare_rate:
+		return load("res://Resources/SizeTiers/rare.tres")
 	else:
-		return load("res://Resources/SizeTiers/small.tres")
+		return load("res://Resources/SizeTiers/common.tres")

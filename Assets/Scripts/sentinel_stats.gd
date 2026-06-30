@@ -19,10 +19,17 @@ const MELEE_ATTACK_SPEED = 0.7
 # Mana Resource ------------------------------------
 var mana = 100.0
 const MAX_MANA = 100.0
-const MANA_REGEN_BASE = 8.0
+const MANA_REGEN_BASE_CONST = 8.0
+var mana_regen_base = MANA_REGEN_BASE_CONST
 const MANA_REGEN_CIRCLE_BONUS = 15.0
 const COMBAT_TIMEOUT = 2.0
 var combat_timer = 0.0
+var equipment_dmg_bonus = 0.0
+var equipment_revive_pct = 0.0
+var equipment_branded_dmg_bonus: float = 0.0
+var equipment_branded_duration_extend: float = 0.0
+var equipment_ult_charge_rate: float = 0.0
+var equipment_skill_cdr: float = 0.0
 
 # Branded ------------------------------------------
 const BRANDED_DURATION = 5.0
@@ -97,7 +104,7 @@ func process_class(delta: float) -> void:
 		is_in_own_circle = false
 
 	if combat_timer <= 0 or is_in_own_circle:
-		mana = min(mana + MANA_REGEN_BASE * delta, MAX_MANA)
+		mana = min(mana + mana_regen_base * delta, MAX_MANA)
 	if is_in_own_circle:
 		mana = min(mana + MANA_REGEN_CIRCLE_BONUS * delta, MAX_MANA)
 
@@ -113,7 +120,8 @@ func process_class(delta: float) -> void:
 		parry_window = false
 
 func _get_judgement_charge_rate() -> float:
-	return JUDGEMENT_CHARGE_RATE * (1.0 + JUDGEMENT_CHARGE_BONUS) if is_in_own_circle else JUDGEMENT_CHARGE_RATE
+	var circle_bonus = JUDGEMENT_CHARGE_BONUS if is_in_own_circle else 0.0
+	return JUDGEMENT_CHARGE_RATE * (1.0 + circle_bonus + equipment_ult_charge_rate / 100.0)
 
 # LMB: Banishment ---------------------------------
 func melee_attack() -> void:
@@ -133,7 +141,9 @@ func melee_attack() -> void:
 		if result and result.collider != body:
 			continue
 		combat_timer = COMBAT_TIMEOUT
-		body.take_damage(BANISHMENT_DAMAGE)
+		var branded_bonus = (1.0 + equipment_branded_dmg_bonus / 100.0) if body.is_in_group("branded") else 1.0
+		var final_dmg = BANISHMENT_DAMAGE * player.buff_damage_mult * (1.0 + equipment_dmg_bonus / 100.0) * branded_bonus
+		body.take_damage(final_dmg)
 		var push_dir = (body.global_position - player.global_position).normalized()
 		push_dir.y = 0.0
 		body.set("impulse", Vector3.UP * BANISHMENT_KNOCKUP)
@@ -146,7 +156,7 @@ func melee_attack() -> void:
 	var brand_target = first_unbranded if first_unbranded else first_branded
 	if brand_target:
 		brand_target.add_to_group("branded")
-		brand_target.set("branded_timer", BRANDED_DURATION)
+		brand_target.set("branded_timer", BRANDED_DURATION + equipment_branded_duration_extend)
 
 # RMB: Punishment ---------------------------------
 func ranged_attack() -> void:
@@ -166,7 +176,7 @@ func ranged_attack() -> void:
 				nearest_dist = d
 				branded = enemy
 	var proj = PROJECTILE_SCENE.instantiate()
-	proj.damage = PUNISHMENT_DAMAGE
+	proj.damage = PUNISHMENT_DAMAGE * (1.0 + equipment_dmg_bonus / 100.0)
 	proj.speed = PUNISHMENT_SPEED * 2 if has_branded else PUNISHMENT_SPEED
 	player.get_tree().root.add_child(proj)
 	var viewport_size = player.get_viewport().get_visible_rect().size
@@ -183,7 +193,7 @@ func ranged_attack() -> void:
 func skill() -> void:
 	if mana < 30.0 or denounce_cooldown > 0:
 		return
-	denounce_cooldown = DENOUNCE_COOLDOWN
+	denounce_cooldown = DENOUNCE_COOLDOWN * (1.0 - equipment_skill_cdr / 100.0)
 	mana -= 30.0
 	if denounce_circle and is_instance_valid(denounce_circle):
 		denounce_circle.queue_free()
@@ -273,6 +283,32 @@ func _add_circle_visual(parent: Node3D, radius: float) -> void:
 	var tex_size = sprite.texture.get_size()
 	sprite.pixel_size = (radius * 2.0) / tex_size.x
 	parent.add_child(sprite)
+
+# Equipment effects --------------------------------
+func _on_equipment_changed():
+	var eq = player.equipment_effects if player else {}
+	mana_regen_base = MANA_REGEN_BASE_CONST * (1.0 + eq.get("mana_regen_pct", 0.0) / 100.0)
+	equipment_dmg_bonus = eq.get("dmg_bonus_pct", 0.0)
+	equipment_revive_pct = eq.get("revive_pct", 0.0)
+	equipment_branded_dmg_bonus = eq.get("branded_dmg_bonus_pct", 0.0)
+	equipment_branded_duration_extend = eq.get("branded_duration_extend", 0.0)
+	equipment_ult_charge_rate = eq.get("ult_charge_rate_pct", 0.0)
+	equipment_skill_cdr = eq.get("skill_cooldown_reduction_pct", 0.0)
+	if eq.get("move_speed_pct", 0.0) != 0.0:
+		player.speed = CLASS_SPEED * (1.0 + eq.get("move_speed_pct", 0.0) / 100.0)
+	else:
+		player.speed = CLASS_SPEED
+
+
+func should_revive() -> bool:
+	var eq = player.equipment_effects if player else {}
+	var roll = randf() * 100.0
+	var chance = eq.get("revive_pct", 0.0)
+	if chance > 0 and roll <= chance:
+		player.hp = player.max_hp * 0.25
+		return true
+	return false
+
 
 func get_dash_stamina_cost() -> float:
 	return CLASS_DASH_COST

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/epic.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Seraph's Sigil"
+rarity = ExtResource("2")
+description = "A celestial sigil of unwavering faith."
+price = 92
+equipment_type = "accessory"
+class_restriction = "Sentinel"
+hp_bonus = 20
+stamina_bonus = 20
+defense = 6
+class_unique_effect = "+15% Ult Charge, +15% Mana Regen, extend Branded by 2s"
+ult_charge_rate_pct=15
+mana_regen_pct=15
+branded_duration_extend=2

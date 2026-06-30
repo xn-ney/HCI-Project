@@ -24,12 +24,16 @@ const MELEE_ATTACK_SPEED = 0.6
 # Focus Resource ----------------------------------
 var focus = 0.0
 const MAX_FOCUS = 100.0
-const FOCUS_PER_HIT = 12.5
-const FOCUS_LOSS_RATIO = 0.5
-const FOCUSED_DURATION = 10.0
+const FOCUS_PER_HIT_BASE = 12.5
+var focus_per_hit = FOCUS_PER_HIT_BASE
+const FOCUS_LOSS_RATIO_BASE = 0.5
+var focus_loss_ratio = FOCUS_LOSS_RATIO_BASE
+const FOCUSED_DURATION_BASE = 10.0
+var focused_duration = FOCUSED_DURATION_BASE
 const FOCUSED_DAMAGE_REDUCTION = 1.5
 var is_focused = false
 var focused_timer = 0.0
+var equipment_skill_cdr: float = 0.0
 
 # LMB: Claw ---------------------------------------
 const CLAW_DAMAGE = 18.0
@@ -95,10 +99,14 @@ func process_class(delta: float) -> void:
 
 	if is_focused:
 		focused_timer -= delta
+		var focused_speed = player.equipment_effects.get("focused_speed_pct", 0.0) if player else 0.0
+		if focused_speed > 0:
+			player.speed = CLASS_SPEED * (1.0 + focused_speed / 100.0)
 		if focused_timer <= 0:
 			is_focused = false
 			focus = 0.0
-			print("Focused state ended")
+			if focused_speed > 0:
+				player.speed = CLASS_SPEED
 
 	# Active: Ravage dash ------------------------
 	if is_ravaging:
@@ -157,7 +165,8 @@ func _execute_damage(body: Node3D) -> void:
 
 
 func get_assassinate_cooldown() -> float:
-	return ASSASSINATE_FOCUSED_COOLDOWN if is_focused else ASSASSINATE_COOLDOWN
+	var base = ASSASSINATE_FOCUSED_COOLDOWN if is_focused else ASSASSINATE_COOLDOWN
+	return base * (1.0 - equipment_skill_cdr / 100.0)
 
 
 # LMB: Claw ---------------------------------------
@@ -179,7 +188,11 @@ func melee_attack() -> void:
 		var result = space_state.intersect_ray(ray_query)
 		if result and result.collider != body:
 			continue
-		body.take_damage(CLAW_DAMAGE)
+		var final_dmg = CLAW_DAMAGE * player.buff_damage_mult
+		body.take_damage(final_dmg)
+		if player.buff_lifesteal_pct > 0:
+			var heal = final_dmg * player.buff_lifesteal_pct
+			player.hp = min(player.hp + heal, player.max_hp)
 		_gain_focus()
 
 
@@ -214,7 +227,7 @@ func skill() -> void:
 	is_ravaging = true
 	ravage_time = RAVAGE_DURATION * (0.5 if player.is_exhausted else 1.0)
 	player.velocity = Vector3.ZERO
-	ravage_cooldown = RAVAGE_COOLDOWN
+	ravage_cooldown = RAVAGE_COOLDOWN * (1.0 - equipment_skill_cdr / 100.0)
 	player.set_collision_mask_value(4, false)
 
 
@@ -264,7 +277,7 @@ func on_take_damage(_amount: float) -> void:
 			focus = 0.0
 			print("Focused state broken by damage")
 	else:
-		focus *= 1.0 - FOCUS_LOSS_RATIO
+		focus *= 1.0 - focus_loss_ratio
 
 
 func _add_focus(amount: float) -> void:
@@ -272,16 +285,16 @@ func _add_focus(amount: float) -> void:
 	focus = min(focus, MAX_FOCUS)
 	if focus >= MAX_FOCUS and not is_focused:
 		is_focused = true
-		focused_timer = FOCUSED_DURATION
-		print("Focused state activated — ", FOCUSED_DURATION, "s")
+		focused_timer = focused_duration
+		print("Focused state activated — ", focused_duration, "s")
 
 
 func _gain_focus() -> void:
-	_add_focus(FOCUS_PER_HIT)
+	_add_focus(focus_per_hit)
 
 
 func _on_knife_hit(_enemy: Node3D) -> void:
-	_add_focus(FOCUS_PER_HIT * 0.6)
+	_add_focus(focus_per_hit * 0.6)
 
 
 # I-Frames ----------------------------------------
@@ -289,9 +302,24 @@ func is_invincible() -> bool:
 	return player.is_dashing or is_ravaging or is_assassinating
 
 
+# Equipment effects --------------------------------
+func _on_equipment_changed():
+	var eq = player.equipment_effects if player else {}
+	focus_per_hit = FOCUS_PER_HIT_BASE * (1.0 + eq.get("focus_gain_pct", 0.0) / 100.0)
+	focus_loss_ratio = FOCUS_LOSS_RATIO_BASE * (1.0 - eq.get("focus_loss_reduction_pct", 0.0) / 100.0)
+	focused_duration = FOCUSED_DURATION_BASE + eq.get("focused_duration_extend", 0.0)
+	equipment_skill_cdr = eq.get("skill_cooldown_reduction_pct", 0.0)
+	if eq.get("move_speed_pct", 0.0) != 0.0:
+		player.speed = CLASS_SPEED * (1.0 + eq.get("move_speed_pct", 0.0) / 100.0)
+	else:
+		player.speed = CLASS_SPEED
+
+
 # Stamina Overrides (called by player.gd) ----------
 func get_dash_stamina_cost() -> float:
-	return 0.0 if is_focused else CLASS_DASH_COST
+	var eq = player.equipment_effects if player else {}
+	var reduction = eq.get("dash_stamina_reduction", 0.0)
+	return max(0.0, (0.0 if is_focused else CLASS_DASH_COST) - reduction)
 
 
 func get_sprint_stamina_drain() -> float:

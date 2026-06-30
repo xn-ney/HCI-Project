@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[sub_resource type="SphereMesh" id="SphereMesh_bomb"]
+radius = 1.5
+height = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bomb"]
+albedo_color = Color(1, 0.4, 0, 0.6)
+emission_enabled = true
+emission = Color(1, 0.3, 0, 1)
+emission_energy_multiplier = 3.0
+transparency = 0.4
+
+[node name="BombExplosion" type="Node3D"]
+
+[node name="Sphere" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_bomb")
+material_override = SubResource("StandardMaterial3D_bomb")

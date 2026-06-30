@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="Script" path="res://Assets/Scripts/Items/EquipmentItem.gd" id="1"]
+[ext_resource type="Resource" path="res://Resources/SizeTiers/epic.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+item_name = "Abyssal Waistguard"
+rarity = ExtResource("2")
+description = "Contains the abyss within."
+price = 95
+equipment_type = "torso"
+class_restriction = "Vessel"
+hp_bonus = 60
+stamina_bonus = 40
+defense = 7
+class_unique_effect = "+15% Damage, Consumed state deals -25% less dmg taken"
+dmg_bonus_pct=15
+consumed_dmg_taken_reduction=25
