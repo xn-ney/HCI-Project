@@ -100,7 +100,7 @@ const CONDITION_NAMES: Dictionary = {
 
 # Condition selection ------------------------------
 func _roll_condition():
-	current_condition_type = randi() % 3 + 1
+	current_condition_type = 1
 
 func get_condition_script() -> Script:
 	return condition_scripts.get(current_condition_type, AmbushCondition)

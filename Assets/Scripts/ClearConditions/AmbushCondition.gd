@@ -3,8 +3,7 @@ extends BaseCondition
 
 # Preloads -----------------------------------------
 const ENEMY_SCENES = [
-	preload("res://Scenes/Enemies/orc.tscn"),
-	preload("res://Scenes/Enemies/goblin_scavenger.tscn"),
+	preload("res://Scenes/Enemies/goblin_archer.tscn")
 ]
 
 # Wave config --------------------------------------
@@ -44,7 +43,9 @@ func _spawn_next() -> void:
 	var enemy = _spawn_queue[_spawn_index].instantiate()
 	_spawn_index += 1
 	get_tree().current_scene.add_child(enemy)
-	var offset = Vector3(randf_range(-8.0, 8.0), 0, randf_range(-8.0, 8.0))
+	var angle = randf_range(0, TAU)
+	var dist = randf_range(4.0, 8.0)
+	var offset = Vector3(cos(angle), 0, sin(angle)) * dist
 	enemy.global_position = player.global_position + offset + Vector3.UP
 	active_enemies.append(enemy)
 

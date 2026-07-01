@@ -180,7 +180,7 @@ func _physics_process(delta: float) -> void:
 			State.IDLE:
 				if distance <= DETECTION_RANGE:
 					state = State.SURPRISED
-					state_timer = anim_player.get_animation("surprised").length
+					state_timer = anim_player.get_animation("surprised").length * 0.4
 					velocity = Vector3.ZERO
 				else:
 					match idle_phase:
@@ -590,7 +590,7 @@ func switch_to_npc_target(npc_node: Node3D):
 	player = _target_override
 	if state == State.SPAWNCHASE:
 		state = State.SURPRISED
-		state_timer = anim_player.get_animation("surprised").length
+		state_timer = anim_player.get_animation("surprised").length * 0.4
 		velocity = Vector3.ZERO
 
 func take_damage(amount: float):

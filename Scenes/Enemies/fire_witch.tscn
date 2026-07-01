@@ -1,13 +1,10 @@
 [gd_scene format=3 uid="uid://bc6sdixmxeouu"]
 
 [ext_resource type="Script" uid="uid://kxsx1x5x6efw" path="res://Assets/Scripts/Enemies/fire_witch.gd" id="1_0ohgh"]
+[ext_resource type="PackedScene" uid="uid://blpbry0cj8e2w" path="res://Assets/3D Models/Fire Witch/Wizard.fbx" id="2_f3rhm"]
+[ext_resource type="PackedScene" uid="uid://ce6ajt3nw1bes" path="res://Assets/3D Models/Fire Witch/Hero_Skull_Staff.fbx" id="3_c4uq4"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r5t7n"]
-albedo_color = Color(0.8392157, 0.54509807, 0, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
 
 [node name="FireWitch" type="CharacterBody3D" unique_id=923788482 groups=["enemies"]]
 collision_layer = 8
@@ -15,10 +12,6 @@ script = ExtResource("1_0ohgh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2128149989]
 shape = SubResource("CapsuleShape3D_0oxh4")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1076851634]
-material_override = SubResource("StandardMaterial3D_r5t7n")
-mesh = SubResource("CapsuleMesh_q26ig")
 
 [node name="ProjectileSpawn" type="Node3D" parent="." unique_id=910235983]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.5257821, 0)
@@ -37,3 +30,16 @@ billboard = 1
 text = "200"
 font_size = 48
 outline_size = 4
+
+[node name="Wizard" parent="." unique_id=381882124 instance=ExtResource("2_f3rhm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01905322, -0.8925001, -0.00014781952)
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Wizard/Wizard_metarig/Skeleton3D" parent_id_path=PackedInt32Array(381882124, 1077651294) index="0" unique_id=400726343]
+transform = Transform3D(-0.14755356, -0.9886472, 0.028370053, 0.03496652, -0.033880517, -0.9988141, 0.98843586, -0.14638671, 0.039568596, -0.7589749, 0.03365001, 0.98245597)
+bone_name = "hand.R"
+bone_idx = 14
+
+[node name="Hero_Skull_Staff" parent="Wizard/Wizard_metarig/Skeleton3D/BoneAttachment3D" unique_id=561538028 instance=ExtResource("3_c4uq4")]
+transform = Transform3D(-0.034149487, 0.899475, 0, -0.9994167, -0.030734535, 0, 0, 0, 0.99999994, 0.031505913, 0.09788212, 0.02459387)
+
+[editable path="Wizard"]
