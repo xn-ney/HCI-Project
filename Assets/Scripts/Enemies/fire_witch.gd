@@ -52,11 +52,16 @@ const KNOCKBACK_FRICTION = 8.0
 const SEPARATION_RADIUS = 1.5
 const SEPARATION_FORCE = 2.0
 
+# Facing ---------------------------------------------
+const ROTATION_SPEED = 10.0
+const FACE_OFFSET = deg_to_rad(180)
+
 var knockback_velocity = Vector3.ZERO
 var impulse = Vector3.ZERO
 var branded_timer = 0.0
 var speed_multiplier = 1.0
 var stunned_timer = 0.0
+var hurt_timer = 0.0
 var disengage_timer = 0.0
 
 # References ----------------------------------------
@@ -68,9 +73,11 @@ var _npc_check_done: bool = false
 @onready var nav_agent = $NavigationAgent3D
 @onready var hp_label = $HPLabel
 @onready var projectile_spawn = $ProjectileSpawn
+@onready var anim_player = $AnimationPlayer
+@onready var skeleton = $Wizard/Wizard_metarig/Skeleton3D
 
 # State machine -------------------------------------
-enum State { IDLE, ATTACK, REPOSITION, FLEE, INTERRUPTED }
+enum State { IDLE, SURPRISED, ATTACK, REPOSITION, FLEE, INTERRUPTED, DEAD }
 enum WanderPhase { WALK, PAUSE }
 
 var state = State.IDLE
@@ -82,13 +89,22 @@ var wander_dir = Vector3.ZERO
 var strafe_dir = 1.0
 
 # Attack mode tracking -----------------------------
+enum MeleePhase { CHARGE, SWING }
 var doing_melee = false
+var melee_phase = MeleePhase.CHARGE
 var interrupt_threshold_hp = 0.0
 
 # AOE marker ---------------------------------------
 var aoe_marker: Sprite3D = null
 var current_projectile: RigidBody3D = null
 var sphere_radius: float
+
+# Head tracking -------------------------------------
+var _head_idx = -1
+var _head_rest_inv = Quaternion.IDENTITY
+
+# Corpse guard --------------------------------------
+var _is_corpse := false
 
 
 func _ready():
@@ -98,6 +114,10 @@ func _ready():
 	sphere_radius = temp.get_node("SphereCollision").shape.radius
 	temp.free()
 	_idle_pick_wander()
+	_setup_animations()
+	_head_idx = skeleton.find_bone("Head")
+	if _head_idx >= 0:
+		_head_rest_inv = skeleton.get_bone_rest(_head_idx).basis.get_rotation_quaternion().inverse()
 
 
 func _physics_process(delta: float) -> void:
@@ -120,6 +140,9 @@ func _physics_process(delta: float) -> void:
 	if stunned_timer > 0:
 		stunned_timer -= delta
 
+	if hurt_timer > 0:
+		hurt_timer -= delta
+
 	if disengage_timer > 0:
 		disengage_timer -= delta
 		if disengage_timer <= 0:
@@ -139,19 +162,28 @@ func _physics_process(delta: float) -> void:
 
 	var distance = global_position.distance_to(player.global_position)
 
-	if distance > AGGRO_LOSS_RANGE:
+	if state == State.DEAD:
+		state_timer -= delta
+		if state_timer <= 0:
+			collision_layer = 0
+			collision_mask = 0
+			set_physics_process(false)
+
+	if distance > AGGRO_LOSS_RANGE and state != State.SURPRISED:
 		if state != State.IDLE:
 			state = State.IDLE
 			_hide_aoe_marker()
 			_idle_pick_wander()
 
-	var can_act = speed_multiplier > 0 and knockback_velocity.length() <= 0.1 and stunned_timer <= 0
+	var can_act = speed_multiplier > 0 and knockback_velocity.length() <= 0.1 and stunned_timer <= 0 and hurt_timer <= 0 and state != State.DEAD
 
 	if can_act:
 		match state:
 			State.IDLE:
 				if distance <= DETECTION_RANGE:
-					_start_attack(distance)
+					state = State.SURPRISED
+					state_timer = anim_player.get_animation("surprised").length * 0.4
+					velocity = Vector3.ZERO
 				else:
 					match wander_phase:
 						WanderPhase.WALK:
@@ -168,16 +200,40 @@ func _physics_process(delta: float) -> void:
 							if wander_pause_timer <= 0:
 								_idle_pick_wander()
 
-			State.ATTACK:
+			State.SURPRISED:
 				velocity.x = 0.0
 				velocity.z = 0.0
 				state_timer -= delta
 				if state_timer <= 0:
-					if doing_melee:
-						_melee_attack()
+					_start_attack(distance)
+
+			State.ATTACK:
+				velocity.x = 0.0
+				velocity.z = 0.0
+				state_timer -= delta
+				if doing_melee:
+					if melee_phase == MeleePhase.CHARGE and state_timer <= anim_player.get_animation("melee_attack").length:
+						melee_phase = MeleePhase.SWING
+					var can_melee = false
+					if melee_phase == MeleePhase.SWING:
+						var melee_len = anim_player.get_animation("melee_attack").length
+						if anim_player.current_animation == "melee_attack" and anim_player.current_animation_position >= melee_len * 0.4:
+							can_melee = true
+						elif state_timer <= 0:
+							can_melee = true
+					if can_melee:
+						if global_position.distance_to(player.global_position) <= MELEE_RANGE + 1.0:
+							_melee_attack()
 						state = State.FLEE
 						state_timer = FLEE_DURATION
-					else:
+				else:
+					var can_shoot = false
+					var shoot_len = anim_player.get_animation("ranged_attack").length
+					if anim_player.current_animation == "ranged_attack" and anim_player.current_animation_position >= shoot_len * 0.5:
+						can_shoot = true
+					elif state_timer <= 0:
+						can_shoot = true
+					if can_shoot:
 						_ranged_attack()
 						state = State.REPOSITION
 						state_timer = REPOSITION_DURATION
@@ -238,7 +294,9 @@ func _physics_process(delta: float) -> void:
 				if state_timer <= 0:
 					if distance >= FLEE_ESCAPE_RANGE:
 						if distance <= DETECTION_RANGE:
-							_start_attack(distance)
+							state = State.SURPRISED
+							state_timer = anim_player.get_animation("surprised").length * 0.4
+							velocity = Vector3.ZERO
 						else:
 							state = State.IDLE
 							_idle_pick_wander()
@@ -251,7 +309,9 @@ func _physics_process(delta: float) -> void:
 				state_timer -= delta
 				if state_timer <= 0:
 					if distance <= DETECTION_RANGE:
-						_start_attack(distance)
+						state = State.SURPRISED
+						state_timer = anim_player.get_animation("surprised").length * 0.4
+						velocity = Vector3.ZERO
 					else:
 						state = State.IDLE
 						_idle_pick_wander()
@@ -281,6 +341,45 @@ func _physics_process(delta: float) -> void:
 		velocity.z = 0.0
 
 	_separate_from_others()
+	_update_animation()
+
+	var face_dir := Vector3.FORWARD
+	if knockback_velocity.length() > 0.1:
+		face_dir = (player.global_position - global_position).normalized()
+	else:
+		match state:
+			State.ATTACK, State.REPOSITION, State.INTERRUPTED, State.SURPRISED:
+				face_dir = (player.global_position - global_position).normalized()
+			State.FLEE:
+				var v = Vector3(velocity.x, 0, velocity.z)
+				if v.length() > 0.1:
+					face_dir = v.normalized()
+				else:
+					face_dir = (player.global_position - global_position).normalized()
+			State.IDLE:
+				var v = Vector3(velocity.x, 0, velocity.z)
+				if v.length() > 0.1:
+					face_dir = v.normalized()
+				else:
+					face_dir = wander_dir
+	if face_dir:
+		face_dir.y = 0.0
+		if face_dir.length() < 0.001:
+			face_dir = Vector3.FORWARD
+		face_dir = face_dir.normalized()
+		var target_basis = Basis.looking_at(face_dir, Vector3.UP)
+		target_basis = target_basis * Basis(Vector3.UP, FACE_OFFSET)
+		global_transform.basis = global_transform.basis.slerp(target_basis, ROTATION_SPEED * delta)
+
+	if _head_idx >= 0 and face_dir != Vector3.ZERO:
+		var head_global = skeleton.to_global(skeleton.get_bone_global_pose(_head_idx).origin)
+		var head_to_player = player.global_position - head_global
+		var pitch = -atan2(head_to_player.y, Vector2(head_to_player.x, head_to_player.z).length())
+		pitch = clamp(pitch, deg_to_rad(-60), deg_to_rad(60))
+		var head_rot = _head_rest_inv * Quaternion(Vector3.RIGHT, pitch)
+		skeleton.set_bone_pose_rotation(_head_idx, head_rot)
+	elif _head_idx >= 0:
+		skeleton.set_bone_pose_rotation(_head_idx, Quaternion.IDENTITY)
 
 	velocity += get_gravity() * delta * 3.0
 	move_and_slide()
@@ -290,8 +389,9 @@ func _start_attack(distance: float) -> void:
 	doing_melee = distance <= MELEE_RANGE
 	interrupt_threshold_hp = hp - MAX_HP * INTERRUPT_HP_THRESHOLD
 	state = State.ATTACK
-	state_timer = ATTACK_CAST_TIME
 	if doing_melee:
+		melee_phase = MeleePhase.CHARGE
+		state_timer = anim_player.get_animation("charging_melee").length + anim_player.get_animation("melee_attack").length
 		if current_projectile != null and is_instance_valid(current_projectile):
 			if current_projectile.landed.is_connected(_on_projectile_landed):
 				current_projectile.landed.disconnect(_on_projectile_landed)
@@ -299,6 +399,8 @@ func _start_attack(distance: float) -> void:
 		_show_aoe_marker()
 		aoe_marker.global_position = global_position
 		aoe_marker.global_position.y = 0.1
+	else:
+		state_timer = anim_player.get_animation("ranged_attack").length
 
 
 func _idle_pick_wander() -> void:
@@ -443,17 +545,13 @@ func switch_to_npc_target(npc_node: Node3D):
 	_npc_check_done = true
 	_target_override = npc_node
 	player = _target_override
-
-func _become_corpse():
-	remove_from_group("enemies")
-	set_physics_process(false)
-	set_process(false)
-	collision_layer = 0
-	collision_mask = 0
-	hp_label.queue_free()
-	$NameLabel.queue_free()
+	state = State.SURPRISED
+	state_timer = anim_player.get_animation("surprised").length * 0.4
+	velocity = Vector3.ZERO
 
 func take_damage(amount: float):
+	if state == State.DEAD:
+		return
 	if is_in_group("branded"):
 		amount *= 0.7
 	hp -= amount
@@ -468,5 +566,121 @@ func take_damage(amount: float):
 
 	if hp <= 0:
 		_hide_aoe_marker()
-		died.emit()
+		_clear_death_state()
+	else:
+		hurt_timer = anim_player.get_animation("hurt").length * 0.5
+
+
+func _clear_death_state():
+	if state == State.DEAD:
+		return
+	state = State.DEAD
+	state_timer = anim_player.get_animation("death").length
+	velocity = Vector3.ZERO
+	died.emit()
+	await get_tree().create_timer(state_timer).timeout
+	if not _is_corpse:
 		_become_corpse()
+
+func _become_corpse():
+	if _is_corpse:
+		return
+	_is_corpse = true
+	remove_from_group("enemies")
+	set_physics_process(false)
+	set_process(false)
+	collision_layer = 0
+	collision_mask = 0
+	hp_label.queue_free()
+	$NameLabel.queue_free()
+
+
+func _setup_animations() -> void:
+	var paths = {
+		idle = "res://Assets/3D Models/Fire Witch/Animations/Idle.fbx",
+		walk_forward = "res://Assets/3D Models/Fire Witch/Animations/Walk Forward.fbx",
+		walk_backward = "res://Assets/3D Models/Fire Witch/Animations/Strafe Back.fbx",
+		strafe_left = "res://Assets/3D Models/Fire Witch/Animations/Strafe Left.fbx",
+		strafe_right = "res://Assets/3D Models/Fire Witch/Animations/Strafe Right.fbx",
+		ranged_attack = "res://Assets/3D Models/Fire Witch/Animations/Ranged attack.fbx",
+		melee_attack = "res://Assets/3D Models/Fire Witch/Animations/Melee attack.fbx",
+		charging_melee = "res://Assets/3D Models/Fire Witch/Animations/Charging Melee.fbx",
+		hurt = "res://Assets/3D Models/Fire Witch/Animations/Hurt.fbx",
+		death = "res://Assets/3D Models/Fire Witch/Animations/On death.fbx",
+		surprised = "res://Assets/3D Models/Fire Witch/Animations/Spot player.fbx",
+	}
+	var loop_anims = ["idle", "walk_forward", "walk_backward", "strafe_left", "strafe_right"]
+	var lib = AnimationLibrary.new()
+	for anim_name in paths:
+		var fbx = load(paths[anim_name]) as PackedScene
+		if not fbx:
+			continue
+		var temp = fbx.instantiate()
+		var src_player = temp.find_child("AnimationPlayer", true, false) as AnimationPlayer
+		if src_player and src_player.has_animation("mixamo_com"):
+			var anim = src_player.get_animation("mixamo_com").duplicate(true)
+			anim.loop_mode = Animation.LOOP_LINEAR if anim_name in loop_anims else Animation.LOOP_NONE
+			for i in range(anim.get_track_count() - 1, -1, -1):
+				var p = str(anim.track_get_path(i))
+				if p == "Wizard_metarig" or p == "metarig":
+					if anim_name == "death":
+						anim.track_set_path(i, NodePath(".."))
+					else:
+						anim.remove_track(i)
+				elif p.begins_with("Wizard_metarig/Skeleton3D:") or p.begins_with("metarig/Skeleton3D:"):
+					var prefix = "Wizard_metarig/Skeleton3D:" if p.begins_with("Wizard_metarig/Skeleton3D:") else "metarig/Skeleton3D:"
+					anim.track_set_path(i, NodePath(":" + p.trim_prefix(prefix)))
+			lib.add_animation(anim_name, anim)
+		temp.queue_free()
+	anim_player.add_animation_library("", lib)
+	anim_player.play("idle")
+
+
+func _dir_anim(move_dir: Vector3) -> String:
+	if move_dir.length() < 0.1:
+		return "idle"
+	var forward = -global_transform.basis.z.normalized()
+	forward.y = 0.0
+	var dot = move_dir.normalized().dot(forward)
+	if dot >= 0.5:
+		return "walk_forward"
+	elif dot <= -0.5:
+		return "walk_backward"
+	elif strafe_dir > 0:
+		return "strafe_right"
+	else:
+		return "strafe_left"
+
+
+func _update_animation() -> void:
+	var anim = "idle"
+	if state == State.DEAD:
+		anim = "death"
+	elif speed_multiplier <= 0 or knockback_velocity.length() > 0.1 or stunned_timer > 0:
+		anim = "idle"
+	elif hurt_timer > 0:
+		anim = "hurt"
+	else:
+		match state:
+			State.SURPRISED:
+				anim = "surprised"
+			State.IDLE:
+				match wander_phase:
+					WanderPhase.WALK:
+						anim = _dir_anim(wander_dir)
+					WanderPhase.PAUSE:
+						anim = "idle"
+			State.ATTACK:
+				if doing_melee:
+					anim = "charging_melee" if melee_phase == MeleePhase.CHARGE else "melee_attack"
+				else:
+					anim = "ranged_attack"
+			State.REPOSITION:
+				var move_dir = Vector3(velocity.x, 0, velocity.z)
+				anim = _dir_anim(move_dir)
+			State.FLEE:
+				anim = "walk_forward"
+			State.INTERRUPTED:
+				anim = "hurt"
+	if anim_player.current_animation != anim:
+		anim_player.play(anim)

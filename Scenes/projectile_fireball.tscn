@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://dt1iq4wfb6cgt"]
+
+[ext_resource type="Script" path="res://Assets/Scripts/projectile_enemy.gd" id="1_mh7wo"]
+[ext_resource type="PackedScene" uid="uid://bpsuf4yrgqwmf" path="res://Assets/3D Models/Goblin Archer/Goblin_Arrow.fbx" id="2_lh0yt"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3wxlm"]
+radius = 0.0859375
+height = 0.6241455
+
+[node name="Projectile" type="RigidBody3D" unique_id=129464058 groups=["projectiles"]]
+continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_mh7wo")
+
+[node name="SphereCollision" type="CollisionShape3D" parent="." unique_id=411223345]
+transform = Transform3D(0.41844922, 0, 0, 0, -0.001727879, -0.553864, 0, 0.99999845, -0.0009570115, 0, 0.013179211, -0.15937394)
+shape = SubResource("CapsuleShape3D_3wxlm")
+
+[node name="Goblin_Arrow" parent="." unique_id=1536939947 instance=ExtResource("2_lh0yt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0061805844, 0.01840353, 0.06278217)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

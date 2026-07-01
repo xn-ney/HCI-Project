@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://c5mfvt3wqsjb6"]
 
-[ext_resource type="Script" path="res://Assets/Scripts/arrow_enemy.gd" id="1_mh7wo"]
+[ext_resource type="Script" uid="uid://c0pu7tgi56vvo" path="res://Assets/Scripts/arrow_enemy.gd" id="1_mh7wo"]
 [ext_resource type="PackedScene" uid="uid://bpsuf4yrgqwmf" path="res://Assets/3D Models/Goblin Archer/Goblin_Arrow.fbx" id="2_goblinarrow"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_qsoed"]
 radius = 0.1
 
-[node name="ArrowProjectile" type="CharacterBody3D" groups=["projectiles"]]
+[node name="ArrowProjectile" type="CharacterBody3D" unique_id=52606020 groups=["projectiles"]]
 script = ExtResource("1_mh7wo")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=757125165]
 shape = SubResource("SphereShape3D_qsoed")
 
-[node name="Goblin_Arrow" parent="." instance=ExtResource("2_goblinarrow")]
+[node name="Goblin_Arrow" parent="." unique_id=1003335728 instance=ExtResource("2_goblinarrow")]

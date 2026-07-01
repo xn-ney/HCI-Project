@@ -31,6 +31,9 @@ text = "200"
 font_size = 48
 outline_size = 4
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+root_node = NodePath("../Wizard/Wizard_metarig/Skeleton3D")
+
 [node name="Wizard" parent="." unique_id=381882124 instance=ExtResource("2_f3rhm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01905322, -0.8925001, -0.00014781952)
 
