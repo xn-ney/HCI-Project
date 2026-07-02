@@ -66,9 +66,19 @@ var _npc_check_done: bool = false
 
 @onready var nav_agent = $NavigationAgent3D
 @onready var hp_label = $HPLabel
+@onready var skeleton = $Basic_Goblin/metarig/Skeleton3D
+@onready var anim_player = $AnimationPlayer
+
+# Head tracking -------------------------------------
+var _head_idx = -1
+var _head_rest_inv = Quaternion.IDENTITY
+
+# Facing ---------------------------------------------
+const FACE_OFFSET = deg_to_rad(180)
+const ROTATION_SPEED = 10.0
 
 # State machine -------------------------------------
-enum State { IDLE, REGROUP, ATTACK, REPOSITION, INTERRUPTED, CRY }
+enum State { IDLE, REGROUP, ATTACK, REPOSITION, INTERRUPTED, CRY, DEAD }
 enum IdlePhase { WALK, PAUSE }
 
 var state = State.IDLE
@@ -82,12 +92,18 @@ var wander_dir = Vector3.ZERO
 var has_attacked = false
 var has_jumped = false
 var lunge_dir = Vector3.ZERO
+var attack_missed = false
+
+# Animation -----------------------------------------
+var hurt_timer = 0.0
+var _is_corpse = false
 
 # Reposition tracking -------------------------------
 enum RepositionPhase { STAND, MOVE, PAUSE }
 var reposition_phase = RepositionPhase.STAND
 var reposition_phase_timer = 0.0
 var reposition_strafe_dir = 1.0
+var strafe_dir = 1.0
 
 # Regroup tracking ----------------------------------
 var regroup_used = false
@@ -102,6 +118,11 @@ func _ready():
 	player = get_tree().get_first_node_in_group("player")
 	_original_player = player
 	_idle_pick_wander()
+	_head_idx = skeleton.find_bone("spine.005")
+	if _head_idx >= 0:
+		_head_rest_inv = skeleton.get_bone_rest(_head_idx).basis.get_rotation_quaternion().inverse()
+	_setup_animations()
+	anim_player.play("walk_forward")
 
 
 func _physics_process(delta: float) -> void:
@@ -256,12 +277,14 @@ func _physics_process(delta: float) -> void:
 					state_timer = REPOSITION_DURATION
 					reposition_phase = RepositionPhase.STAND
 					reposition_phase_timer = REPOSITION_STAND_DELAY
+					attack_missed = true
 
 				if state_timer <= 0 and state == State.ATTACK:
 					state = State.REPOSITION
 					state_timer = REPOSITION_DURATION
 					reposition_phase = RepositionPhase.STAND
 					reposition_phase_timer = REPOSITION_STAND_DELAY
+					attack_missed = true
 
 			State.REPOSITION:
 				var move_speed = MOVE_SPEED * speed_multiplier
@@ -277,6 +300,8 @@ func _physics_process(delta: float) -> void:
 						reposition_phase = RepositionPhase.MOVE
 						reposition_phase_timer = randf_range(0.5, 1.2)
 						reposition_strafe_dir = 1.0 if (randf() < 0.5) else -1.0
+						strafe_dir = reposition_strafe_dir
+						attack_missed = false
 
 				elif reposition_phase == RepositionPhase.PAUSE:
 					velocity.x = 0.0
@@ -285,6 +310,8 @@ func _physics_process(delta: float) -> void:
 						reposition_phase = RepositionPhase.MOVE
 						reposition_phase_timer = randf_range(0.5, 1.2)
 						reposition_strafe_dir = 1.0 if (randf() < 0.5) else -1.0
+						strafe_dir = reposition_strafe_dir
+						attack_missed = false
 
 				else:
 					if distance > OVERSHOOT_STOP_RANGE:
@@ -367,6 +394,47 @@ func _physics_process(delta: float) -> void:
 
 	_separate_from_others()
 
+	# Facing --------------------------------------------
+	var face_dir := Vector3.FORWARD
+	if stunned_timer > 0:
+		face_dir = Vector3.ZERO
+	elif knockback_velocity.length() > 0.1:
+		face_dir = (player.global_position - global_position).normalized()
+	else:
+		match state:
+			State.ATTACK, State.REPOSITION, State.INTERRUPTED:
+				face_dir = (player.global_position - global_position).normalized()
+			State.IDLE, State.REGROUP:
+				var v = Vector3(velocity.x, 0, velocity.z)
+				if v.length() > 0.1:
+					face_dir = v.normalized()
+				else:
+					face_dir = wander_dir
+	if face_dir:
+		face_dir.y = 0.0
+		if face_dir.length() < 0.001:
+			face_dir = Vector3.FORWARD
+		face_dir = face_dir.normalized()
+		var target_basis = Basis.looking_at(face_dir, Vector3.UP)
+		target_basis = target_basis * Basis(Vector3.UP, FACE_OFFSET)
+		global_transform.basis = global_transform.basis.slerp(target_basis, ROTATION_SPEED * delta)
+
+	# Head tracking --------------------------------------
+	if _head_idx >= 0 and face_dir != Vector3.ZERO:
+		var head_global = skeleton.to_global(skeleton.get_bone_global_pose(_head_idx).origin)
+		var head_to_player = player.global_position - head_global
+		var pitch = -atan2(head_to_player.y, Vector2(head_to_player.x, head_to_player.z).length())
+		pitch = clamp(pitch, deg_to_rad(-60), deg_to_rad(60))
+		var head_rot = _head_rest_inv * Quaternion(Vector3.RIGHT, pitch)
+		skeleton.set_bone_pose_rotation(_head_idx, head_rot)
+	elif _head_idx >= 0:
+		skeleton.set_bone_pose_rotation(_head_idx, Quaternion.IDENTITY)
+
+	if hurt_timer > 0:
+		hurt_timer -= delta
+
+	_update_animation()
+
 	velocity += get_gravity() * delta * 3.0
 	move_and_slide()
 
@@ -376,6 +444,7 @@ func _attack_enter() -> void:
 	state_timer = LUNGE_DURATION
 	has_attacked = false
 	has_jumped = false
+	attack_missed = false
 	var dir = (player.global_position - global_position).normalized()
 	dir.y = 0.0
 	lunge_dir = dir
@@ -484,6 +553,9 @@ func switch_to_npc_target(npc_node: Node3D):
 	player = _target_override
 
 func _become_corpse():
+	if _is_corpse:
+		return
+	_is_corpse = true
 	remove_from_group("enemies")
 	set_physics_process(false)
 	set_process(false)
@@ -493,10 +565,11 @@ func _become_corpse():
 	$NameLabel.queue_free()
 
 func take_damage(amount: float):
+	if state == State.DEAD:
+		return
 	if state == State.CRY:
 		hp = 0
-		died.emit()
-		_become_corpse()
+		_clear_death_state()
 		return
 	if is_in_group("branded"):
 		amount *= 0.7
@@ -504,5 +577,109 @@ func take_damage(amount: float):
 	hp = clamp(hp, 0, MAX_HP)
 	hp_label.text = str(round(hp))
 	if hp <= 0:
-		died.emit()
+		_clear_death_state()
+	else:
+		hurt_timer = anim_player.get_animation("hurt").length * 0.5
+
+
+func _clear_death_state():
+	if state == State.DEAD:
+		return
+	state = State.DEAD
+	state_timer = anim_player.get_animation("death").length
+	velocity = Vector3.ZERO
+	died.emit()
+	await get_tree().create_timer(state_timer).timeout
+	if not _is_corpse:
 		_become_corpse()
+
+
+func _setup_animations() -> void:
+	var ANIM_BASE = "res://Assets/3D Models/Goblin Scavenger/Animation/"
+	var paths = {
+		walk_forward = ANIM_BASE + "Walk Forward.fbx",
+		walk_backward = ANIM_BASE + "Walk Backwards.fbx",
+		strafe_left = ANIM_BASE + "Left Strafe.fbx",
+		strafe_right = ANIM_BASE + "Right Strafe.fbx",
+		sprint = ANIM_BASE + "Sprint.fbx",
+		surprised = ANIM_BASE + "Spot player.fbx",
+		hurt = ANIM_BASE + "Hurt.fbx",
+		death = ANIM_BASE + "Death.fbx",
+		stunned = ANIM_BASE + "Goblin scav stunned.fbx",
+		jump_attack = ANIM_BASE + "Jump attack.fbx",
+		attack_missed = ANIM_BASE + "Attack missed.fbx",
+		cry = ANIM_BASE + "Cry.fbx",
+	}
+	var loop_anims = ["walk_forward", "walk_backward", "strafe_left", "strafe_right", "sprint"]
+	var lib = AnimationLibrary.new()
+	for anim_name in paths:
+		var fbx = load(paths[anim_name]) as PackedScene
+		if not fbx:
+			continue
+		var temp = fbx.instantiate()
+		var src_player = temp.find_child("AnimationPlayer", true, false) as AnimationPlayer
+		if src_player and src_player.has_animation("mixamo_com"):
+			var anim = src_player.get_animation("mixamo_com").duplicate(true)
+			anim.loop_mode = Animation.LOOP_LINEAR if anim_name in loop_anims else Animation.LOOP_NONE
+			for i in range(anim.get_track_count() - 1, -1, -1):
+				var p = str(anim.track_get_path(i))
+				if p == "metarig":
+					if anim_name == "death":
+						anim.track_set_path(i, NodePath(".."))
+					else:
+						anim.remove_track(i)
+				elif p.begins_with("metarig/Skeleton3D:"):
+					anim.track_set_path(i, NodePath(":" + p.trim_prefix("metarig/Skeleton3D:")))
+			lib.add_animation(anim_name, anim)
+		temp.queue_free()
+	anim_player.add_animation_library("", lib)
+
+
+func _dir_anim(move_dir: Vector3) -> String:
+	if move_dir.length() < 0.1:
+		return "walk_forward"
+	var forward = -global_transform.basis.z.normalized()
+	forward.y = 0.0
+	var dot = move_dir.normalized().dot(forward)
+	if dot >= 0.5:
+		return "walk_forward"
+	elif dot <= -0.5:
+		return "walk_backward"
+	elif strafe_dir > 0:
+		return "strafe_right"
+	else:
+		return "strafe_left"
+
+
+func _update_animation() -> void:
+	var anim = "walk_forward"
+	if state == State.DEAD:
+		anim = "death"
+	elif speed_multiplier <= 0 or knockback_velocity.length() > 0.1 or stunned_timer > 0:
+		anim = "stunned"
+	elif hurt_timer > 0:
+		anim = "hurt"
+	else:
+		match state:
+			State.REGROUP:
+				anim = "sprint"
+			State.ATTACK:
+				anim = "jump_attack"
+			State.CRY:
+				anim = "cry"
+			State.REPOSITION:
+				var move_dir = Vector3(velocity.x, 0, velocity.z)
+				if attack_missed and move_dir.length() < 0.1:
+					anim = "attack_missed"
+				else:
+					anim = _dir_anim(move_dir)
+			State.IDLE:
+				var move_dir = Vector3(velocity.x, 0, velocity.z)
+				if move_dir.length() > 0.1:
+					anim = _dir_anim(move_dir)
+				else:
+					anim = "walk_forward"
+			State.INTERRUPTED:
+				anim = "walk_forward"
+	if anim_player.current_animation != anim:
+		anim_player.play(anim)
