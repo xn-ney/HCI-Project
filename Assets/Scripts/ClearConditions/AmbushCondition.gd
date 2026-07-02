@@ -3,11 +3,11 @@ extends BaseCondition
 
 # Preloads -----------------------------------------
 const ENEMY_SCENES = [
-	preload("res://Scenes/Enemies/fire_witch.tscn")
+	preload("res://Scenes/Enemies/orc_brute.tscn")
 ]
 
 # Wave config --------------------------------------
-var total_waves: int = 2
+var total_waves: int = 1
 var current_wave: int = 0
 var active_enemies: Array[Node] = []
 var _spawn_queue: Array[PackedScene] = []
@@ -29,10 +29,10 @@ func _start_wave() -> void:
 	current_wave += 1
 	is_wave_active = true
 	_wave_time = 0.0
-	var count = randi() % 6 + 10
+	var count = 1
 	_spawn_queue = []
 	for i in range(count):
-		_spawn_queue.append(ENEMY_SCENES[randi() % ENEMY_SCENES.size()])
+		_spawn_queue.append(ENEMY_SCENES[0])
 	_spawn_index = 0
 	_spawn_stagger = 0.0
 	print("Wave ", current_wave, " — ", count, " enemies queued")

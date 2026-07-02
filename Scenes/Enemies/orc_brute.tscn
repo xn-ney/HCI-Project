@@ -1,29 +1,19 @@
-[gd_scene format=3 uid="uid://dkeoruxgaa48d"]
+[gd_scene format=3 uid="uid://c5pg26k7o8s6b"]
 
 [ext_resource type="Script" uid="uid://b080jgfgw6c6t" path="res://Assets/Scripts/Enemies/orc_brute.gd" id="1_hghv2"]
+[ext_resource type="PackedScene" uid="uid://bi5pyplsle57b" path="res://Assets/3D Models/Orc Brute/Ironbound_Marauder.fbx" id="2_0a22w"]
+[ext_resource type="PackedScene" uid="uid://d103lhgcd76yn" path="res://Assets/3D Models/Orc Brute/Furnace_Gavel.fbx" id="3_qcc0s"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
 height = 2.107
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ne65n"]
-albedo_color = Color(0.8384838, 2.815649e-06, 9.62615e-07, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
 
 [node name="OrcBrute" type="CharacterBody3D" unique_id=322335710 groups=["enemies"]]
 collision_layer = 8
 script = ExtResource("1_hghv2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=254163438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16284847, 0)
 shape = SubResource("CapsuleShape3D_0oxh4")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=175773632]
-transform = Transform3D(1, 0, 0, 0, 1.2428017, 0, 0, 0, 1, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_ne65n")
-mesh = SubResource("CapsuleMesh_q26ig")
-
-[node name="ProjectileSpawn" type="Node3D" parent="." unique_id=1388259209]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2761085, 0.65345, 0)
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=587323435]
 
@@ -39,3 +29,94 @@ billboard = 1
 text = "200"
 font_size = 48
 outline_size = 4
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=381988061]
+root_node = NodePath("../Ironbound_Marauder/metarig/Skeleton3D")
+
+[node name="Ironbound_Marauder" parent="." unique_id=1141392876 instance=ExtResource("2_0a22w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.04495865, -0.9528984, 0.032262206)
+
+[node name="Skeleton3D" parent="Ironbound_Marauder/metarig" parent_id_path=PackedInt32Array(1141392876, 558576629) index="0" unique_id=791904123]
+bones/1/position = Vector3(3.8899395e-15, 0.15221947, -4.8121613e-09)
+bones/1/rotation = Quaternion(-0.08765025, -1.1875041e-07, -1.0448701e-08, 0.9961513)
+bones/1/scale = Vector3(1, 1.0000001, 1.0000001)
+bones/2/position = Vector3(7.6828567e-16, 0.21901572, 1.8174204e-09)
+bones/2/rotation = Quaternion(-0.054273438, 1.19033615e-07, -6.4698975e-09, 0.9985261)
+bones/2/scale = Vector3(1, 0.9999999, 0.9999999)
+bones/3/position = Vector3(-1.1813493e-15, 0.1728877, 3.6480832e-09)
+bones/3/rotation = Quaternion(0.0016271446, -1.1920922e-07, 1.9397675e-10, 0.9999987)
+bones/4/position = Vector3(3.868003e-15, 0.19257845, 4.077951e-09)
+bones/4/rotation = Quaternion(0.29737327, 1.13816476e-07, 3.5449595e-08, 0.95476127)
+bones/4/scale = Vector3(1, 1, 0.9999998)
+bones/5/position = Vector3(1.8782024e-14, 0.10225834, -8.335069e-08)
+bones/5/rotation = Quaternion(0.3492008, 3.351126e-07, 2.0813918e-07, 0.93704796)
+bones/5/scale = Vector3(1, 0.99999994, 0.99999994)
+bones/6/position = Vector3(3.6694928e-14, 0.052487608, 2.8743889e-08)
+bones/6/rotation = Quaternion(-0.598068, -2.8661762e-07, -3.5647494e-07, 0.80144536)
+bones/6/scale = Vector3(1, 1.0000001, 1)
+bones/7/position = Vector3(0.0183, 0.13722104, 0.07825093)
+bones/7/rotation = Quaternion(-0.5493277, -0.42897028, -0.44149467, 0.56507176)
+bones/7/scale = Vector3(0.9999998, 0.9999999, 1)
+bones/8/position = Vector3(0.00025480325, 0.3937883, -0.02039276)
+bones/8/rotation = Quaternion(0.06628585, 0.730525, -0.0747996, 0.6755327)
+bones/8/scale = Vector3(0.99999994, 0.9999999, 1)
+bones/9/position = Vector3(2.6046584e-07, 0.40253818, 1.7853344e-08)
+bones/9/rotation = Quaternion(0.01639122, -0.0719301, 0.001943871, 0.9972731)
+bones/10/position = Vector3(2.4229246e-08, 0.34202725, -3.7191914e-09)
+bones/10/rotation = Quaternion(0.023191256, 0.015870271, 0.006653451, 0.99958295)
+bones/10/scale = Vector3(1.0000001, 1.0000001, 1.0000001)
+bones/11/position = Vector3(-0.0183, 0.13722104, 0.07825093)
+bones/11/rotation = Quaternion(-0.5493277, 0.42897028, 0.44149467, 0.56507176)
+bones/11/scale = Vector3(0.9999998, 0.9999999, 1)
+bones/12/position = Vector3(-0.00025480325, 0.3937883, -0.02039276)
+bones/12/rotation = Quaternion(0.06628585, -0.730525, 0.0747996, 0.6755327)
+bones/12/scale = Vector3(0.99999994, 0.9999999, 1)
+bones/13/position = Vector3(-2.6046584e-07, 0.40253818, 1.7853344e-08)
+bones/13/rotation = Quaternion(0.01639122, 0.0719301, -0.001943871, 0.9972731)
+bones/14/position = Vector3(-2.4229246e-08, 0.34202725, -3.7191914e-09)
+bones/14/rotation = Quaternion(0.023191256, -0.015870271, -0.006653451, 0.99958295)
+bones/14/scale = Vector3(1.0000001, 1.0000001, 1.0000001)
+bones/15/position = Vector3(5.4415506e-15, 3.7199197e-09, 1.4429373e-08)
+bones/15/rotation = Quaternion(-0.2432687, -0.75343007, -0.33053505, 0.51372176)
+bones/15/scale = Vector3(1, 1, 0.9999999)
+bones/16/position = Vector3(5.4415506e-15, 3.7199197e-09, 1.4429373e-08)
+bones/16/rotation = Quaternion(-0.2432687, 0.75342983, 0.33053508, 0.5137222)
+bones/17/position = Vector3(0.16133742, 0.07081842, 0.025942346)
+bones/17/rotation = Quaternion(0.9876532, 0.07379298, -0.013865504, 0.13749012)
+bones/17/scale = Vector3(1.0000013, 1.0000002, 1.0000043)
+bones/18/position = Vector3(-3.9710866e-07, 0.5389324, 1.319901e-08)
+bones/18/rotation = Quaternion(0.1857367, 0.015927251, 0.0266166, 0.98210984)
+bones/18/scale = Vector3(0.99999976, 0.9999993, 1.0000007)
+bones/19/position = Vector3(2.768483e-07, 0.3971724, 7.222321e-08)
+bones/19/rotation = Quaternion(-0.7391747, -0.026714109, 0.03803828, 0.6719079)
+bones/19/scale = Vector3(0.9999998, 1.0000001, 0.9999999)
+bones/20/position = Vector3(-1.1551348e-06, 0.27091116, -5.259534e-08)
+bones/20/rotation = Quaternion(-1.4101555e-07, 0.99184304, -0.12746538, 7.118719e-08)
+bones/20/scale = Vector3(1.0000001, 1.0000005, 1)
+bones/21/position = Vector3(-0.037999846, -0.0071922853, 0.089941144)
+bones/21/rotation = Quaternion(-0.49491793, -0.3511429, 0.6137607, 0.50502735)
+bones/21/scale = Vector3(1.0000001, 1.0000006, 0.99999934)
+bones/22/position = Vector3(-0.16133742, 0.07081842, 0.025942257)
+bones/22/rotation = Quaternion(0.98765314, -0.07379179, 0.013872125, 0.13749062)
+bones/23/position = Vector3(2.942613e-08, 0.53893226, 2.9275975e-09)
+bones/23/rotation = Quaternion(0.18573706, -0.015928049, -0.026613614, 0.98210984)
+bones/23/scale = Vector3(1, 0.9999997, 1)
+bones/24/position = Vector3(-2.2242576e-08, 0.39717257, -1.5835795e-08)
+bones/24/rotation = Quaternion(-0.73917466, 0.026708206, -0.03804313, 0.67190796)
+bones/24/scale = Vector3(1, 0.99999994, 1)
+bones/25/position = Vector3(5.2738745e-08, 0.27091223, -4.4213483e-08)
+bones/25/rotation = Quaternion(-9.950236e-08, 0.99184316, -0.12746444, -5.4788245e-07)
+bones/25/scale = Vector3(1, 1, 1)
+bones/26/position = Vector3(0.038000137, -0.007192165, 0.089941055)
+bones/26/rotation = Quaternion(0.70133936, -0.70133865, 0.090130486, 0.09013148)
+bones/26/scale = Vector3(0.99999994, 0.9999999, 0.99999994)
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Ironbound_Marauder/metarig/Skeleton3D" index="0" unique_id=597162730]
+transform = Transform3D(-0.0017124263, -0.9994513, 0.03307612, 0.037074577, -0.033116836, -0.9987634, 0.99931115, -0.00048403, 0.037110917, -1.144427, 0.081880406, 1.5710053)
+bone_name = "hand.R"
+bone_idx = 14
+
+[node name="Furnace_Gavel" parent="Ironbound_Marauder/metarig/Skeleton3D/BoneAttachment3D" unique_id=1984372051 instance=ExtResource("3_qcc0s")]
+transform = Transform3D(-0.058322515, 0.99829054, -0.0038056874, -0.10137327, -0.002129872, 0.99484617, 0.9931373, 0.05840773, 0.1013242, -0.057595715, 0.05974871, -0.028980598)
+
+[editable path="Ironbound_Marauder"]

@@ -339,7 +339,9 @@ func _physics_process(delta: float) -> void:
 
 	const ROTATION_SPEED = 10.0
 	var face_dir: Vector3
-	if knockback_velocity.length() > 0.1:
+	if stunned_timer > 0:
+		face_dir = Vector3.ZERO
+	elif knockback_velocity.length() > 0.1:
 		face_dir = (player.global_position - global_position).normalized()
 	else:
 		match state:

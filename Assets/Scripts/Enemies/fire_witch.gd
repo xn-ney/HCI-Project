@@ -344,7 +344,9 @@ func _physics_process(delta: float) -> void:
 	_update_animation()
 
 	var face_dir := Vector3.FORWARD
-	if knockback_velocity.length() > 0.1:
+	if stunned_timer > 0:
+		face_dir = Vector3.ZERO
+	elif knockback_velocity.length() > 0.1:
 		face_dir = (player.global_position - global_position).normalized()
 	else:
 		match state:
@@ -608,6 +610,7 @@ func _setup_animations() -> void:
 		hurt = "res://Assets/3D Models/Fire Witch/Animations/Hurt.fbx",
 		death = "res://Assets/3D Models/Fire Witch/Animations/On death.fbx",
 		surprised = "res://Assets/3D Models/Fire Witch/Animations/Spot player.fbx",
+		stunned = "res://Assets/3D Models/Fire Witch/Animations/Stunned.fbx",
 	}
 	var loop_anims = ["idle", "walk_forward", "walk_backward", "strafe_left", "strafe_right"]
 	var lib = AnimationLibrary.new()
@@ -657,7 +660,7 @@ func _update_animation() -> void:
 	if state == State.DEAD:
 		anim = "death"
 	elif speed_multiplier <= 0 or knockback_velocity.length() > 0.1 or stunned_timer > 0:
-		anim = "idle"
+		anim = "stunned"
 	elif hurt_timer > 0:
 		anim = "hurt"
 	else:

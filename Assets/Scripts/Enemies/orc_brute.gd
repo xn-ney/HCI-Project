@@ -20,7 +20,7 @@ const ATTACK_COOLDOWN = 2.5
 
 # Chase --------------------------------------------
 const CHASE_TIMEOUT = 5.0
-const CHASE_READY_DELAY = 0.8
+const CHASE_READY_DELAY = 0.3
 const CHASE_SPEED_MULT = 1.9
 
 # Dash and Slam -------------------------------------
@@ -33,7 +33,6 @@ const SLAM_DAMAGE = 40.0
 const SLAM_KNOCKUP = 15.0
 const SLAM_RANGE = 7
 const SLAM_KNOCKBACK = 30.0
-const SLAM_WINDUP = 0.8
 
 # Interrupt ------------------------------------------
 const INTERRUPT_DURATION = 1.5
@@ -58,11 +57,15 @@ const KNOCKBACK_FRICTION = 8.0
 const SEPARATION_RADIUS = 1.5
 const SEPARATION_FORCE = 2.0
 
+# Facing ---------------------------------------------
+const FACE_OFFSET = deg_to_rad(180)
+
 var knockback_velocity = Vector3.ZERO
 var impulse = Vector3.ZERO
 var branded_timer = 0.0
 var speed_multiplier = 1.0
 var stunned_timer = 0.0
+var hurt_timer = 0.0
 var disengage_timer = 0.0
 var dash_dir = Vector3.ZERO
 
@@ -76,10 +79,13 @@ var melee_indicator: Sprite3D = null
 
 @onready var nav_agent = $NavigationAgent3D
 @onready var hp_label = $HPLabel
+@onready var anim_player = $AnimationPlayer
+@onready var skeleton = $Ironbound_Marauder/metarig/Skeleton3D
+@onready var collision_shape = $CollisionShape3D
 
 # State machine -------------------------------------
-enum State { IDLE, SPAWNCHASE, PREPARE, ATTACK }
-enum AttackPhase { CHASE, CHASE_READY, DASH_CHARGE, DASHING, SLAMMING }
+enum State { IDLE, SPAWNCHASE, SURPRISED, PREPARE, ATTACK, DEAD }
+enum AttackPhase { CHASE, CHASE_READY, SWING, DASH_CHARGE, DASHING, SLAMMING }
 enum PreparePhase { WALK, PAUSE }
 
 var state = State.IDLE
@@ -94,6 +100,15 @@ var idle_walk_timer: float
 var idle_pause_timer: float
 var wander_dir = Vector3.ZERO
 
+# Swing tracking ------------------------------------
+var swing_hit_dealt = false
+
+# Head tracking -------------------------------------
+var _head_idx = -1
+
+# Corpse guard --------------------------------------
+var _is_corpse := false
+
 
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
@@ -105,6 +120,8 @@ func _ready():
 		_idle_pick_wander()
 	_slam_indicator_create()
 	_melee_indicator_create()
+	_setup_animations()
+	_head_idx = skeleton.find_bone("Head")
 
 
 func _physics_process(delta: float) -> void:
@@ -127,6 +144,9 @@ func _physics_process(delta: float) -> void:
 	if stunned_timer > 0:
 		stunned_timer -= delta
 
+	if hurt_timer > 0:
+		hurt_timer -= delta
+
 	if disengage_timer > 0:
 		disengage_timer -= delta
 		if disengage_timer <= 0:
@@ -139,12 +159,18 @@ func _physics_process(delta: float) -> void:
 	var distance = global_position.distance_to(player.global_position)
 
 	# Lose aggro if too far -------------------------
-	if distance > AGGRO_LOSS_RANGE:
+	if distance > AGGRO_LOSS_RANGE and state != State.SURPRISED:
 		if state != State.IDLE and state != State.SPAWNCHASE and state != State.ATTACK:
 			state = State.IDLE
 			_idle_pick_wander()
 
-	var can_act = speed_multiplier > 0 and knockback_velocity.length() <= 0.1 and stunned_timer <= 0
+	if state == State.DEAD:
+		state_timer -= delta
+		if state_timer <= 0:
+			collision_shape.set_deferred("disabled", true)
+			set_physics_process(false)
+
+	var can_act = speed_multiplier > 0 and knockback_velocity.length() <= 0.1 and stunned_timer <= 0 and hurt_timer <= 0 and state != State.DEAD
 
 	if can_act:
 		match state:
@@ -166,9 +192,9 @@ func _physics_process(delta: float) -> void:
 
 			State.IDLE:
 				if distance <= DETECTION_RANGE:
-					state = State.ATTACK
-					attack_phase = AttackPhase.CHASE
-					chase_timer = CHASE_TIMEOUT
+					state = State.SURPRISED
+					state_timer = anim_player.get_animation("surprised").length * 0.4
+					velocity = Vector3.ZERO
 				else:
 					match idle_phase:
 						PreparePhase.WALK:
@@ -184,6 +210,15 @@ func _physics_process(delta: float) -> void:
 							idle_pause_timer -= delta
 							if idle_pause_timer <= 0:
 								_idle_pick_wander()
+
+			State.SURPRISED:
+				velocity.x = 0.0
+				velocity.z = 0.0
+				state_timer -= delta
+				if state_timer <= 0:
+					state = State.PREPARE
+					state_timer = PREPARE_DURATION
+					_prepare_enter()
 
 			State.PREPARE:
 				var move_speed = MOVE_SPEED * speed_multiplier
@@ -213,7 +248,7 @@ func _physics_process(delta: float) -> void:
 					state = State.ATTACK
 					if randf() < DASH_CHANCE:
 						attack_phase = AttackPhase.DASH_CHARGE
-						state_timer = DASH_CHARGE_TIME
+						state_timer = anim_player.get_animation("charging").length
 						velocity = Vector3.ZERO
 					else:
 						attack_phase = AttackPhase.CHASE
@@ -237,13 +272,8 @@ func _physics_process(delta: float) -> void:
 							melee_indicator.visible = true
 						chase_timer -= delta
 						if chase_timer <= 0:
-							if randf() < DASH_CHANCE:
-								attack_phase = AttackPhase.DASH_CHARGE
-								state_timer = DASH_CHARGE_TIME
-								velocity = Vector3.ZERO
-							else:
-								_melee_attack()
-								_attack_finished(distance)
+							_melee_attack_hit()
+							_attack_finished(distance)
 
 					AttackPhase.CHASE_READY:
 						velocity.x = 0.0
@@ -251,7 +281,18 @@ func _physics_process(delta: float) -> void:
 						state_timer -= delta
 						if state_timer <= 0:
 							melee_indicator.visible = false
-							_melee_attack()
+							attack_phase = AttackPhase.SWING
+							swing_hit_dealt = false
+							state_timer = anim_player.get_animation("normal_attack").length
+
+					AttackPhase.SWING:
+						velocity.x = 0.0
+						velocity.z = 0.0
+						state_timer -= delta
+						if not swing_hit_dealt and state_timer <= anim_player.get_animation("normal_attack").length * 0.75:
+							swing_hit_dealt = true
+							_melee_attack_hit()
+						if state_timer <= 0:
 							_attack_finished(distance)
 
 					AttackPhase.DASH_CHARGE:
@@ -271,16 +312,21 @@ func _physics_process(delta: float) -> void:
 						if distance <= DASH_STOP_RANGE or state_timer <= 0:
 							velocity = Vector3.ZERO
 							attack_phase = AttackPhase.SLAMMING
-							state_timer = SLAM_WINDUP
+							swing_hit_dealt = false
+							state_timer = anim_player.get_animation("slam").length
 
 					AttackPhase.SLAMMING:
 						velocity.x = 0.0
 						velocity.z = 0.0
 						slam_indicator.visible = true
 						state_timer -= delta
+						if not swing_hit_dealt and state_timer <= anim_player.get_animation("slam").length * 0.85:
+							swing_hit_dealt = true
+							_slam_attack()
+							slam_indicator.visible = false
+							state_timer = 0.3
 						if state_timer <= 0:
 							slam_indicator.visible = false
-							_slam_attack()
 							_attack_finished(distance)
 
 		# Status label ----------------------------------
@@ -311,6 +357,48 @@ func _physics_process(delta: float) -> void:
 		velocity.z = 0.0
 
 	_separate_from_others()
+	_update_animation()
+
+	# Facing --------------------------------------------
+	var face_dir: Vector3
+	if stunned_timer > 0:
+		face_dir = Vector3.ZERO
+	elif knockback_velocity.length() > 0.1:
+		face_dir = (player.global_position - global_position).normalized()
+	else:
+		match state:
+			State.SURPRISED, State.PREPARE:
+				face_dir = (player.global_position - global_position).normalized()
+			State.ATTACK:
+				match attack_phase:
+					AttackPhase.DASHING:
+						face_dir = dash_dir
+					AttackPhase.CHASE:
+						var v = Vector3(velocity.x, 0, velocity.z)
+						face_dir = v.normalized() if v.length() > 0.1 else Vector3.FORWARD
+					_:
+						face_dir = (player.global_position - global_position).normalized()
+			_:
+				var v = Vector3(velocity.x, 0, velocity.z)
+				face_dir = v.normalized() if v.length() > 0.1 else wander_dir if wander_dir.length() > 0.1 else Vector3.FORWARD
+	if face_dir:
+		face_dir.y = 0.0
+		if face_dir.length() < 0.001:
+			face_dir = Vector3.FORWARD
+		face_dir = face_dir.normalized()
+		var target_basis = Basis.looking_at(face_dir, Vector3.UP)
+		target_basis = target_basis * Basis(Vector3.UP, FACE_OFFSET)
+		global_transform.basis = global_transform.basis.slerp(target_basis, 10.0 * delta)
+
+	# Head tracking --------------------------------------
+	if _head_idx >= 0 and face_dir != Vector3.ZERO:
+		var head_global = skeleton.to_global(skeleton.get_bone_global_pose(_head_idx).origin)
+		var head_to_player = player.global_position - head_global
+		var pitch = -atan2(head_to_player.y, Vector2(head_to_player.x, head_to_player.z).length())
+		pitch = clamp(pitch, deg_to_rad(-60), deg_to_rad(60))
+		skeleton.set_bone_pose_rotation(_head_idx, Quaternion(Vector3.RIGHT, pitch))
+	elif _head_idx >= 0:
+		skeleton.set_bone_pose_rotation(_head_idx, Quaternion.IDENTITY)
 
 	velocity += get_gravity() * delta * 3.0
 	move_and_slide()
@@ -348,7 +436,7 @@ func _prepare_enter() -> void:
 	prepare_move_timer = randf_range(PREPARE_WALK_MIN, PREPARE_WALK_MAX)
 
 
-func _melee_attack() -> void:
+func _melee_attack_hit() -> void:
 	if global_position.distance_to(player.global_position) > MELEE_RANGE:
 		return
 	player.take_damage(MELEE_DAMAGE)
@@ -420,13 +508,40 @@ func switch_to_npc_target(npc_node: Node3D):
 	_npc_check_done = true
 	_target_override = npc_node
 	player = _target_override
-	if state == State.SPAWNCHASE:
-		state = State.PREPARE
-		state_timer = PREPARE_DURATION
-		velocity = Vector3.ZERO
-		_prepare_enter()
+	state = State.SURPRISED
+	state_timer = anim_player.get_animation("surprised").length * 0.4
+	velocity = Vector3.ZERO
+
+func take_damage(amount: float):
+	if state == State.DEAD:
+		return
+	if is_in_group("branded"):
+		amount *= 0.7
+	hp -= amount
+	hp = clamp(hp, 0, MAX_HP)
+	hp_label.text = str(round(hp))
+	if hp <= 0:
+		_clear_death_state()
+	else:
+		hurt_timer = anim_player.get_animation("hurt").length * 0.5
+
+func _clear_death_state():
+	if state == State.DEAD:
+		return
+	state = State.DEAD
+	state_timer = anim_player.get_animation("death").length
+	velocity = Vector3.ZERO
+	slam_indicator.visible = false
+	melee_indicator.visible = false
+	died.emit()
+	await get_tree().create_timer(state_timer).timeout
+	if not _is_corpse:
+		_become_corpse()
 
 func _become_corpse():
+	if _is_corpse:
+		return
+	_is_corpse = true
 	remove_from_group("enemies")
 	set_physics_process(false)
 	set_process(false)
@@ -436,12 +551,120 @@ func _become_corpse():
 	if has_node("NameLabel"):
 		$NameLabel.queue_free()
 
-func take_damage(amount: float):
-	if is_in_group("branded"):
-		amount *= 0.7
-	hp -= amount
-	hp = clamp(hp, 0, MAX_HP)
-	hp_label.text = str(round(hp))
-	if hp <= 0:
-		died.emit()
-		_become_corpse()
+
+func _setup_animations() -> void:
+	var paths = {
+		idle = "res://Assets/3D Models/Orc Brute/Animations/Orc Idle.fbx",
+		walk_forward = "res://Assets/3D Models/Orc Brute/Animations/Walk forward.fbx",
+		walk_backward = "res://Assets/3D Models/Orc Brute/Animations/Walk Backwards.fbx",
+		chase = "res://Assets/3D Models/Orc Brute/Animations/Chase.fbx",
+		charging = "res://Assets/3D Models/Orc Brute/Animations/Charging.fbx",
+		dash = "res://Assets/3D Models/Orc Brute/Animations/Dash.fbx",
+		normal_attack = "res://Assets/3D Models/Orc Brute/Animations/Normal Attack V3.fbx",
+		slam = "res://Assets/3D Models/Orc Brute/Animations/Slam attack.fbx",
+		surprised = "res://Assets/3D Models/Orc Brute/Animations/Spots player.fbx",
+		hurt = "res://Assets/3D Models/Orc Brute/Animations/Hurt.fbx",
+		death = "res://Assets/3D Models/Orc Brute/Animations/Death.fbx",
+		stunned = "res://Assets/3D Models/Orc Brute/Animations/Stunned.fbx",
+	}
+	var loop_anims = ["idle", "walk_forward", "walk_backward", "chase"]
+	var lib = AnimationLibrary.new()
+	for anim_name in paths:
+		var fbx = load(paths[anim_name]) as PackedScene
+		if not fbx:
+			continue
+		var temp = fbx.instantiate()
+		var src_player = temp.find_child("AnimationPlayer", true, false) as AnimationPlayer
+		if not src_player:
+			src_player = temp.find_child("AnimationPlayer", true, true) as AnimationPlayer
+		if not src_player:
+			var all_ap = temp.find_children("*", "AnimationPlayer", true, false)
+			if all_ap.size() > 0:
+				src_player = all_ap[0] as AnimationPlayer
+		if src_player:
+			var anim_name_src = ""
+			for c in ["mixamo_com", "mixamo.com", anim_name, anim_name.capitalize()]:
+				if src_player.has_animation(c):
+					anim_name_src = c
+					break
+			if anim_name_src.is_empty():
+				var list = src_player.get_animation_list()
+				if list.size() > 0:
+					anim_name_src = list[0]
+			if not anim_name_src.is_empty() and src_player.has_animation(anim_name_src):
+				var anim = src_player.get_animation(anim_name_src).duplicate(true)
+				anim.loop_mode = Animation.LOOP_LINEAR if anim_name in loop_anims else Animation.LOOP_NONE
+				for i in range(anim.get_track_count() - 1, -1, -1):
+					var p = str(anim.track_get_path(i))
+					if p.ends_with("metarig") or p == "metarig":
+						if anim_name == "death":
+							anim.track_set_path(i, NodePath(".."))
+						else:
+							anim.remove_track(i)
+					elif p.contains("Skeleton3D:"):
+						var parts = p.split("Skeleton3D:")
+						if parts.size() >= 2:
+							anim.track_set_path(i, NodePath(":" + parts[-1]))
+				lib.add_animation(anim_name, anim)
+		temp.queue_free()
+	anim_player.add_animation_library("", lib)
+	anim_player.play("idle")
+
+
+func _dir_anim(move_dir: Vector3) -> String:
+	if move_dir.length() < 0.1:
+		return "idle"
+	var fwd = -global_transform.basis.z
+	fwd.y = 0.0
+	fwd = fwd.normalized()
+	var dot = move_dir.normalized().dot(fwd)
+	if dot >= 0.5:
+		return "walk_forward"
+	elif dot <= -0.5:
+		return "walk_backward"
+	else:
+		return "walk_forward"
+
+
+func _update_animation() -> void:
+	var anim = "idle"
+	if state == State.DEAD:
+		anim = "death"
+	elif speed_multiplier <= 0 or knockback_velocity.length() > 0.1 or stunned_timer > 0:
+		anim = "stunned"
+	elif hurt_timer > 0:
+		anim = "hurt"
+	else:
+		match state:
+			State.SPAWNCHASE:
+				anim = "chase"
+			State.IDLE:
+				match idle_phase:
+					PreparePhase.WALK:
+						anim = _dir_anim(wander_dir)
+					PreparePhase.PAUSE:
+						anim = "idle"
+			State.SURPRISED:
+				anim = "surprised"
+			State.PREPARE:
+				match prepare_phase:
+					PreparePhase.WALK:
+						anim = _dir_anim(wander_dir)
+					PreparePhase.PAUSE:
+						anim = "idle"
+			State.ATTACK:
+				match attack_phase:
+					AttackPhase.CHASE:
+						anim = "chase"
+					AttackPhase.CHASE_READY:
+						anim = "idle"
+					AttackPhase.SWING:
+						anim = "normal_attack"
+					AttackPhase.DASH_CHARGE:
+						anim = "charging"
+					AttackPhase.DASHING:
+						anim = "dash"
+					AttackPhase.SLAMMING:
+						anim = "slam"
+	if anim_player.current_animation != anim:
+		anim_player.play(anim)

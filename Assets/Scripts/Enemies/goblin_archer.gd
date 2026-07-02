@@ -303,7 +303,9 @@ func _physics_process(delta: float) -> void:
 
 	const ROTATION_SPEED = 10.0
 	var face_dir := Vector3.FORWARD
-	if knockback_velocity.length() > 0.1:
+	if stunned_timer > 0:
+		face_dir = Vector3.ZERO
+	elif knockback_velocity.length() > 0.1:
 		face_dir = (player.global_position - global_position).normalized()
 	else:
 		match state:
@@ -446,6 +448,7 @@ func _setup_animations() -> void:
 		strafe_right = "res://Assets/3D Models/Goblin Archer/Animations/Strafe Right.fbx",
 		surprised = "res://Assets/3D Models/Goblin Archer/Animations/Spots Player.fbx",
 		hurt = "res://Assets/3D Models/Goblin Archer/Animations/When hit.fbx",
+		stunned = "res://Assets/3D Models/Goblin Archer/Animations/Stunned.fbx",
 	}
 	var loop_anims = ["idle", "sprint", "walk_forward", "walk_backward", "strafe_left", "strafe_right"]
 	var lib = AnimationLibrary.new()
@@ -494,7 +497,7 @@ func _update_animation() -> void:
 	if state == State.DEAD:
 		anim = "death"
 	elif speed_multiplier <= 0 or knockback_velocity.length() > 0.1 or stunned_timer > 0:
-		anim = "idle"
+		anim = "stunned"
 	elif hurt_timer > 0:
 		anim = "hurt"
 	else:

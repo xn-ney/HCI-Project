@@ -1,26 +1,19 @@
 [gd_scene format=3 uid="uid://dc1md344jcp5q"]
 
 [ext_resource type="Script" uid="uid://dh3p6quckkfe4" path="res://Assets/Scripts/Enemies/goblin_scavenger.gd" id="1_hghv2"]
+[ext_resource type="PackedScene" uid="uid://84snn6vwk8g7" path="res://Assets/3D Models/Goblin Scavenger/Basic_Goblin.fbx" id="2_n3seb"]
+[ext_resource type="PackedScene" uid="uid://cttmhpkboms8v" path="res://Assets/3D Models/Goblin Scavenger/Goblin_Rusty_Shiv.fbx" id="3_4om7f"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0oxh4"]
 height = 1.25
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ne65n"]
-albedo_color = Color(0.4, 0.5, 0.15, 1)
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_q26ig"]
 
 [node name="Enemy" type="CharacterBody3D" unique_id=1422240559 groups=["enemies", "scavenger"]]
 collision_layer = 8
 script = ExtResource("1_hghv2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=612689257]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0.074186444, 0)
 shape = SubResource("CapsuleShape3D_0oxh4")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1220974954]
-transform = Transform3D(1, 0, 0, 0, 0.75, 0, 0, 0, 1, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_ne65n")
-mesh = SubResource("CapsuleMesh_q26ig")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1971144181]
 
@@ -36,3 +29,16 @@ billboard = 1
 text = "40"
 font_size = 48
 outline_size = 4
+
+[node name="Basic_Goblin" parent="." unique_id=1998858014 instance=ExtResource("2_n3seb")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.003906399, -0.42042997, 0.015494585)
+
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="Basic_Goblin/metarig/Skeleton3D" parent_id_path=PackedInt32Array(1998858014, 702116415) index="4" unique_id=2118799958]
+transform = Transform3D(-0.028984562, -0.9989328, 0.0359618, 0.06809009, -0.037866518, -0.9969603, 0.99725735, -0.026447847, 0.06911495, -0.3527681, 0.017874734, 0.5152172)
+bone_name = "hand.R"
+bone_idx = 14
+
+[node name="Goblin_Rusty_Shiv" parent="Basic_Goblin/metarig/Skeleton3D/BoneAttachment3D" unique_id=1533839294 instance=ExtResource("3_4om7f")]
+transform = Transform3D(-0.0642788, 0.7974063, -0.0033855834, -0.7963025, -0.06436789, -0.041941494, -0.042077918, 0, 0.7988927, 0.034452423, 0.029721063, 0.023370568)
+
+[editable path="Basic_Goblin"]
